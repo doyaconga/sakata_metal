@@ -34,6 +34,17 @@ let scoreState={bonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
 const p={x:150,y:G-62,w:58,h:62,vy:0,jumps:0,on:true,rot:0};
 
+// Run game simulation at the original 60 updates per second regardless of
+// whether the display refreshes at 60, 120, 144 Hz, or another rate.
+const FIXED_STEP_MS=1000/60;
+const MAX_CATCH_UP_STEPS=5;
+let lastFrameTime=0;
+let frameAccumulator=0;
+function resetFrameClock(now=performance.now()){
+ lastFrameTime=now;
+ frameAccumulator=0;
+}
+
 let thunderLatch=false;
 function getTotalScore(){return Math.floor(dist)+scoreState.bonus}
 function itemChanceInterval(atDistance=dist){
@@ -96,7 +107,8 @@ function reset(){
  lb.classList.remove('activeNow');
  spawnPattern();
  const token=gameToken;
- rafId=requestAnimationFrame(()=>loop(token));
+ resetFrameClock();
+ rafId=requestAnimationFrame(now=>loop(token,now));
 }
 function jump(){
  if(titleMode)return;
@@ -578,17 +590,29 @@ function update(){
    pendingSeasonBanner='';bannerT=85;
  }
 }
-function loop(token){
+function loop(token,now=performance.now()){
  if(token!==gameToken)return;
- if(!run){
-   if(gameOverExplosionTimer>0 || gameOverFragments.length){
-     updateGameOverExplosion();draw();
-     rafId=requestAnimationFrame(()=>loop(token));
-   }else{draw();rafId=null}
-   return;
+ const elapsed=Math.min(
+   Math.max(0,now-lastFrameTime),
+   FIXED_STEP_MS*MAX_CATCH_UP_STEPS
+ );
+ lastFrameTime=now;
+ frameAccumulator+=elapsed;
+
+ let steps=0;
+ while(frameAccumulator>=FIXED_STEP_MS && steps<MAX_CATCH_UP_STEPS){
+   if(run)update();
+   else if(gameOverExplosionTimer>0 || gameOverFragments.length)updateGameOverExplosion();
+   else break;
+   frameAccumulator-=FIXED_STEP_MS;
+   steps++;
  }
- update();draw();
- rafId=requestAnimationFrame(()=>loop(token));
+ draw();
+ if(run || gameOverExplosionTimer>0 || gameOverFragments.length){
+   rafId=requestAnimationFrame(nextNow=>loop(token,nextNow));
+ }else{
+   rafId=null;
+ }
 }
 loadDebugSettings();
 if(DEBUG_BUILD)document.querySelector('#debugBtn').classList.remove('hidden');
