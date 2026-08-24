@@ -12,8 +12,8 @@ const GAME_CONFIG={
   initialSpeed:6,
   speedStep:.39,
   maxSpeed:10,
-  lariatDurationFrames:180,
-  lariatCooldownFrames:1200,
+  lariatDurationFrames:180,  // 発動時間：約3秒（60フレーム＝1秒）
+  lariatCooldownFrames:1200, // 発動開始から再使用可能になるまで：約20秒。発動中も減少する
   lariatWarningFrames:60,
   lariatCriticalFrames:24,
   lariatEndInvulnFrames:60,
