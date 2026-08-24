@@ -17,6 +17,13 @@ const GAME_CONFIG={
   lariatWarningFrames:60,
   lariatCriticalFrames:24,
   lariatEndInvulnFrames:60,
+  cycloneRequiredPieces:3,
+  cycloneDurationFrames:360,
+  cycloneTargetCount:30,
+  cyclonePieceIntervalMin:350,
+  cyclonePieceIntervalMax:550,
+  cycloneEscapeMaxFrames:120,
+  cycloneCountdownStepFrames:42,
   chargeRecoveryRatio:.20,
   chargeIntervalMin:250,
   chargeIntervalMax:450,
@@ -41,6 +48,11 @@ const DEBUG_SETTING_DEFS=[
   {key:'lariatWarningSec',label:'終了予告開始（残り秒）',min:0,max:5,step:.1,get:()=>GAME_CONFIG.lariatWarningFrames/60,set:v=>GAME_CONFIG.lariatWarningFrames=Math.round(v*60)},
   {key:'lariatCriticalSec',label:'高速点滅開始（残り秒）',min:0,max:3,step:.1,get:()=>GAME_CONFIG.lariatCriticalFrames/60,set:v=>GAME_CONFIG.lariatCriticalFrames=Math.round(v*60)},
   {key:'lariatEndInvulnSec',label:'終了後すり抜け無敵（秒）',min:0,max:5,step:.1,get:()=>GAME_CONFIG.lariatEndInvulnFrames/60,set:v=>GAME_CONFIG.lariatEndInvulnFrames=Math.round(v*60)},
+  {key:'cycloneRequiredPieces',label:'CYCLONE 必要アイテム数',min:1,max:10,step:1,get:()=>GAME_CONFIG.cycloneRequiredPieces,set:v=>GAME_CONFIG.cycloneRequiredPieces=Math.round(v)},
+  {key:'cycloneDurationSec',label:'CYCLONE 持続時間（秒）',min:1,max:15,step:.5,get:()=>GAME_CONFIG.cycloneDurationFrames/60,set:v=>GAME_CONFIG.cycloneDurationFrames=Math.round(v*60)},
+  {key:'cycloneTargetCount',label:'CYCLONE 出現動物数',min:1,max:100,step:1,get:()=>GAME_CONFIG.cycloneTargetCount,set:v=>GAME_CONFIG.cycloneTargetCount=Math.round(v)},
+  {key:'cyclonePieceMin',label:'CYCLONE 最短間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.cyclonePieceIntervalMin,set:v=>GAME_CONFIG.cyclonePieceIntervalMin=Math.round(v)},
+  {key:'cyclonePieceMax',label:'CYCLONE 最長間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.cyclonePieceIntervalMax,set:v=>GAME_CONFIG.cyclonePieceIntervalMax=Math.round(v)},
   {key:'chargeRecoveryPercent',label:'道中CHARGE回復量（%）',min:0,max:100,step:5,get:()=>GAME_CONFIG.chargeRecoveryRatio*100,set:v=>GAME_CONFIG.chargeRecoveryRatio=v/100},
   {key:'chargeIntervalMin',label:'道中CHARGE 最短間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.chargeIntervalMin,set:v=>GAME_CONFIG.chargeIntervalMin=Math.round(v)},
   {key:'chargeIntervalMax',label:'道中CHARGE 最長間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.chargeIntervalMax,set:v=>GAME_CONFIG.chargeIntervalMax=Math.round(v)},
@@ -69,6 +81,7 @@ function normalizeDebugConfig(){
   GAME_CONFIG.initialSpeed=Math.min(GAME_CONFIG.initialSpeed,GAME_CONFIG.maxSpeed);
   GAME_CONFIG.lariatWarningFrames=Math.min(GAME_CONFIG.lariatWarningFrames,GAME_CONFIG.lariatDurationFrames);
   GAME_CONFIG.lariatCriticalFrames=Math.min(GAME_CONFIG.lariatCriticalFrames,GAME_CONFIG.lariatWarningFrames);
+  GAME_CONFIG.cyclonePieceIntervalMax=Math.max(GAME_CONFIG.cyclonePieceIntervalMin,GAME_CONFIG.cyclonePieceIntervalMax);
   GAME_CONFIG.chargeIntervalMax=Math.max(GAME_CONFIG.chargeIntervalMin,GAME_CONFIG.chargeIntervalMax);
   GAME_CONFIG.snakeCycleMaxFrames=Math.max(GAME_CONFIG.snakeCycleMinFrames,GAME_CONFIG.snakeCycleMaxFrames);
   for(const range of GAME_CONFIG.itemChanceRanges)range[3]=Math.max(range[2],range[3]);

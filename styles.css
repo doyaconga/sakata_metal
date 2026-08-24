@@ -5,6 +5,15 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 #banner{position:absolute;left:50%;top:27%;transform:translate(-50%,-50%);font-size:40px;font-weight:950;opacity:0;transition:opacity .2s;text-align:center}
 #banner.show{opacity:1}#msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:800}.hidden{display:none!important}
 #pauseBtn{position:absolute;right:18px;top:14px;z-index:20;pointer-events:auto;width:46px;height:42px;padding:0;border:3px solid #fff;border-radius:10px;background:#315271;color:#fff;box-shadow:0 3px 0 #172b3c;font-size:22px;font-weight:1000;line-height:1;cursor:pointer}
+#cycloneOverlay{position:absolute;inset:0;z-index:18;display:grid;place-items:center;overflow:hidden;pointer-events:none}
+#cycloneCutin{width:100%;height:190px;display:flex;align-items:center;justify-content:center;gap:34px;background:linear-gradient(100deg,rgba(55,0,0,.94),rgba(183,32,20,.94),rgba(255,177,32,.94));border-block:5px solid #fff;box-shadow:0 0 28px #000;animation:cycloneCutinIn .28s ease-out}
+#cycloneCutin img{width:155px;height:155px;object-fit:contain;filter:drop-shadow(5px 6px 0 rgba(0,0,0,.55))}
+#cycloneCutin div{display:flex;flex-direction:column;line-height:.88;transform:skew(-8deg)}
+#cycloneCutin span,#cycloneCutin strong{font-weight:1000;font-style:italic;color:#fff;text-shadow:5px 5px 0 #5b0b08}
+#cycloneCutin span{font-size:54px}#cycloneCutin strong{font-size:72px;color:#ffe45c}
+#cycloneCountdown{font-size:150px;font-weight:1000;font-style:italic;color:#fff;text-shadow:7px 7px 0 #7a1510,-3px -3px 0 #f4c542;animation:cycloneCountPop .24s ease-out}
+@keyframes cycloneCutinIn{from{transform:translateX(110%)}to{transform:translateX(0)}}
+@keyframes cycloneCountPop{from{transform:scale(1.7);opacity:0}to{transform:scale(1);opacity:1}}
 #panel{width:min(520px,calc(100% - 36px));min-height:440px;box-sizing:border-box;background:#000a;padding:32px 34px;border-radius:16px;display:flex;flex-direction:column;justify-content:center}#panel b{display:block;font-size:32px;margin-bottom:8px}
 #lariatWrap{position:absolute;right:18px;bottom:18px;pointer-events:auto}
 #lariatBtn{
@@ -27,6 +36,8 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 #activeFill{display:block;width:100%;height:100%;background:#f2c94c;transform-origin:left center;transform:scaleX(1)}
 #lariatBtn.activeNow #activeGauge{display:block}
 #lariatBtn.activeNow #lariatGauge{display:none}
+#lariatBtn.cycloneReady{background:#b86b12;box-shadow:0 2px 0 #603300;border-color:#fff4a8;animation:cycloneReadyPulse .7s ease-in-out infinite alternate}
+@keyframes cycloneReadyPulse{to{filter:brightness(1.32);transform:scale(1.035)}}
 
 #lariatStatus{display:block;margin-top:4px;font-size:10px;letter-spacing:1px;color:#ddd}
 #lariatBtn:disabled{opacity:.65;cursor:default;box-shadow:none}
@@ -145,6 +156,7 @@ body.titleOnly #scoreModal:not(.hidden){
 #pauseConfirmButtons{display:flex;justify-content:center;gap:12px;margin-top:35px}
 #pauseConfirmButtons button{width:180px}
 @media(max-width:620px){#pauseBtn{right:10px;top:9px;width:42px;height:38px;font-size:19px}#pausePanel{min-height:360px;padding:25px 20px}#pauseTitle{margin-bottom:30px}#pauseButtons{gap:22px 9px}#pauseButtons button{padding:10px 7px;font-size:13px}#pauseConfirmButtons button{width:145px;font-size:14px}}
+@media(max-width:620px){#cycloneCutin{height:145px;gap:15px}#cycloneCutin img{width:110px;height:110px}#cycloneCutin span{font-size:34px}#cycloneCutin strong{font-size:45px}#cycloneCountdown{font-size:105px}}
 
 
 #titleScreen{
