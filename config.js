@@ -1,4 +1,3 @@
-const phaseNames=['朝','昼','夕方','夜'];
 const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。

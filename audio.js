@@ -75,9 +75,6 @@ function sfxGameOver(){
   tone(245,.22,'square',.12,180,.19);
   tone(165,.42,'sawtooth',.14,70,.42);
 }
-function sfxStage(){
-  initAudio();tone(440,.08,'square',.08,550);tone(550,.08,'square',.09,700,.08);tone(700,.18,'square',.11,950,.16);
-}
 function sfxButton(){
   initAudio();tone(520,.055,'square',.07,650);
 }
