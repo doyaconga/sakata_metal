@@ -36,7 +36,7 @@ function commitDebugInputs(showStatus=true){
   if(showStatus)setDebugStatus(hasAnimal?'自動保存しました。次のSTARTから反映されます。':'出現する動物を1匹以上選択してください。',!hasAnimal);
   return hasAnimal;
 }
-let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0,shakeTimer=0;
+let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0;
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
@@ -99,7 +99,7 @@ function reset(){
  if(rafId!==null){cancelAnimationFrame(rafId);rafId=null;}
  if(gameOverMessageTimeout!==null){clearTimeout(gameOverMessageTimeout);gameOverMessageTimeout=null;}
  run=true;
- dist=0;cleared=0;stage=GAME_CONFIG.startStage;speed=GAME_CONFIG.initialSpeed;spawnTimer=100;groundOffset=0;lariatTimer=0;lariatCooldown=0;lariatEndInvuln=0;shakeTimer=0;thunderLatch=false;
+ dist=0;cleared=0;stage=GAME_CONFIG.startStage;speed=GAME_CONFIG.initialSpeed;spawnTimer=100;groundOffset=0;lariatTimer=0;lariatCooldown=0;lariatEndInvuln=0;thunderLatch=false;
  items=[];meatShield=0;rescueInvuln=0;itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
@@ -139,8 +139,7 @@ function useLariat(){
  lariatEndInvuln=0;
  scoreState.lariatCombo=0;scoreState.lariatBonus=0;
  sfxLariat();
- startBgm('lariat');   // 10 seconds
- shakeTimer=240;
+ startBgm('lariat');
  const lb=document.querySelector('#lariatBtn');
  lb.disabled=true;
  lb.classList.add('activeNow');
@@ -684,7 +683,6 @@ function returnToTitle(){
   lariatTimer=0;
   lariatCooldown=0;
   lariatEndInvuln=0;
-  shakeTimer=0;
 
   const msg=document.querySelector('#msg');
   if(msg)msg.classList.add('hidden');
