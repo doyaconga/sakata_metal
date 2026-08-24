@@ -196,6 +196,7 @@ body.titleOnly #scoreModal:not(.hidden){
 #debugActions button{min-width:130px;padding:9px 12px;border:2px solid #2b211b;border-radius:8px;color:#fff;font-weight:900;cursor:pointer}
 #debugApply{background:#35652f}#debugReset{background:#9d6b20}#debugClose{background:#555}
 #debugStatus{text-align:center;min-height:20px;margin-top:10px;color:#35652f;font-size:13px;font-weight:900}
+#debugStatus.error{color:#b3261e}
 @media(max-width:620px){#debugBtn{right:7px;bottom:7px;font-size:10px;padding:6px 8px}#debugPanel{padding:14px}#debugFields{grid-template-columns:1fr 95px;gap:7px}.debugLabel{font-size:12px}.debugInput{font-size:14px}#debugAnimalChecks{grid-template-columns:repeat(2,1fr)}}
 #titleFaces{
   position:absolute;

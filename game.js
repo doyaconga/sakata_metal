@@ -17,14 +17,24 @@ function renderDebugSettings(){
 function collectDebugInputValues(){
   const values={};
   for(const def of DEBUG_SETTING_DEFS){const input=document.querySelector('#debug-'+def.key);if(input)values[def.key]=input.value}
-  values.enabledAnimals=[...document.querySelectorAll('.debugAnimalInput:checked')].map(input=>input.value);
+  const animalInputs=[...document.querySelectorAll('.debugAnimalInput')];
+  if(animalInputs.length>0)values.enabledAnimals=animalInputs.filter(input=>input.checked).map(input=>input.value);
   return values;
 }
+function setDebugStatus(message,isError=false){
+  const status=document.querySelector('#debugStatus');
+  status.textContent=message;
+  status.classList.toggle('error',isError);
+}
 function commitDebugInputs(showStatus=true){
-  const values=collectDebugInputValues();if(Object.keys(values).length===0)return;
-  applyDebugValues(values);
-  try{localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()))}catch(err){}
-  if(showStatus)document.querySelector('#debugStatus').textContent='自動保存しました。次のSTARTから反映されます。';
+  const values=collectDebugInputValues();
+  if(Object.keys(values).length>0){
+    applyDebugValues(values);
+    try{localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()))}catch(err){}
+  }
+  const hasAnimal=debugEnabledAnimals.size>0;
+  if(showStatus)setDebugStatus(hasAnimal?'自動保存しました。次のSTARTから反映されます。':'出現する動物を1匹以上選択してください。',!hasAnimal);
+  return hasAnimal;
 }
 let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0,shakeTimer=0;
 let debugHitboxes=false;
@@ -626,7 +636,12 @@ startTitleDemo();
 document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
-  if(DEBUG_BUILD)commitDebugInputs(false);
+  if(DEBUG_BUILD&&!commitDebugInputs(false)){
+    renderDebugSettings();
+    setDebugStatus('ゲームを開始するには、出現する動物を1匹以上選択してください。',true);
+    document.querySelector('#debugModal').classList.remove('hidden');
+    return;
+  }
 
   initAudio();
   sfxStart();
@@ -656,14 +671,14 @@ document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
   document.body.classList.remove('scoreModalOpen');
 });
 document.querySelector('#debugBtn').addEventListener('pointerdown',e=>{
-  e.preventDefault();e.stopPropagation();if(!DEBUG_BUILD)return;sfxButton();renderDebugSettings();document.querySelector('#debugStatus').textContent='';document.querySelector('#debugModal').classList.remove('hidden');
+  e.preventDefault();e.stopPropagation();if(!DEBUG_BUILD)return;sfxButton();renderDebugSettings();setDebugStatus('');document.querySelector('#debugModal').classList.remove('hidden');
 });
 document.querySelector('#debugClose').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();commitDebugInputs(false);sfxButton();document.querySelector('#debugModal').classList.add('hidden');
 });
 document.querySelector('#debugApply').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();
-  commitDebugInputs(false);renderDebugSettings();document.querySelector('#debugStatus').textContent='保存しました。次のSTARTから反映されます。';sfxButton();
+  const hasAnimal=commitDebugInputs(false);renderDebugSettings();setDebugStatus(hasAnimal?'保存しました。次のSTARTから反映されます。':'出現する動物を1匹以上選択してください。',!hasAnimal);sfxButton();
 });
 document.querySelector('#debugFields').addEventListener('change',e=>{
   if(!e.target.classList.contains('debugInput'))return;commitDebugInputs(true);
@@ -678,7 +693,7 @@ document.querySelector('#debugAnimalsNone').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();for(const input of document.querySelectorAll('.debugAnimalInput'))input.checked=false;commitDebugInputs(true);sfxButton();
 });
 document.querySelector('#debugReset').addEventListener('pointerdown',e=>{
-  e.preventDefault();e.stopPropagation();applyDebugValues(DEBUG_DEFAULT_VALUES);try{localStorage.removeItem(DEBUG_STORAGE_KEY)}catch(err){}renderDebugSettings();document.querySelector('#debugStatus').textContent='初期値に戻しました。';sfxButton();
+  e.preventDefault();e.stopPropagation();applyDebugValues(DEBUG_DEFAULT_VALUES);try{localStorage.removeItem(DEBUG_STORAGE_KEY)}catch(err){}renderDebugSettings();setDebugStatus('初期値に戻しました。');sfxButton();
 });
 
 document.querySelector('#titleReturnBtn').addEventListener('pointerdown',e=>{
