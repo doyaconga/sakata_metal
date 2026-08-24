@@ -678,6 +678,13 @@ function returnToTitle(){
   paused=false;pauseConfirmAction=null;
   run=false;
   titleMode=true;
+  gameToken++;
+  if(rafId!==null){cancelAnimationFrame(rafId);rafId=null;}
+  if(gameOverMessageTimeout!==null){clearTimeout(gameOverMessageTimeout);gameOverMessageTimeout=null;}
+  gameOverFragments=[];
+  gameOverExplosionTimer=0;
+  playerExploded=false;
+  gameOverRetryReady=false;
   lariatTimer=0;
   lariatCooldown=0;
   lariatEndInvuln=0;
