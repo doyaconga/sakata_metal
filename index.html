@@ -52,6 +52,7 @@
 <div id="gameShell">
 <div id="wrap"><canvas id="game" width="960" height="540"></canvas>
 <div id="ui"><div id="score"></div><div id="sub"></div><div id="meatHud"></div><div id="banner"></div>
+<button id="pauseBtn" type="button" aria-label="ゲームを一時停止">Ⅱ</button>
 <div id="lariatWrap"><button id="lariatBtn" type="button">
   <span id="lariatLabel">ダブルラリアット</span>
   <span id="lariatGauge"><span id="lariatFill"></span></span>
@@ -70,6 +71,28 @@
     </div>
   </div>
 </div></div></div></div>
+<div id="pauseOverlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+  <div id="pausePanel">
+    <div id="pauseMenu">
+      <div id="pauseTitle">PAUSE</div>
+      <div id="pauseButtons">
+        <button id="pauseResumeBtn" type="button">ゲームを再開</button>
+        <button id="pauseScoreBtn" type="button">ランキング</button>
+        <button id="pauseRestartBtn" type="button">リスタート</button>
+        <button id="pauseTitleBtn" type="button">タイトルへ戻る</button>
+      </div>
+      <div id="pauseHint">Escキーでも再開できます</div>
+    </div>
+    <div id="pauseConfirm" class="hidden">
+      <div id="pauseConfirmTitle"></div>
+      <div id="pauseConfirmText"></div>
+      <div id="pauseConfirmButtons">
+        <button id="pauseConfirmCancel" type="button">キャンセル</button>
+        <button id="pauseConfirmOk" type="button"></button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 <script src="audio.js"></script>
 <script src="config.js"></script>

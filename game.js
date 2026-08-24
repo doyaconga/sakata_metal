@@ -37,6 +37,7 @@ function commitDebugInputs(showStatus=true){
   return hasAnimal;
 }
 let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0,shakeTimer=0;
+let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
@@ -91,6 +92,8 @@ function finishItemChance(){
 
 function reset(){
  titleMode=false;
+ paused=false;pauseConfirmAction=null;pauseRankingOpen=false;
+ document.querySelector('#pauseOverlay').classList.add('hidden');
  document.body.classList.remove('titleOnly');document.body.classList.add('gameOnly');
  gameToken++;
  if(rafId!==null){cancelAnimationFrame(rafId);rafId=null;}
@@ -109,6 +112,7 @@ function reset(){
  updateItemHud();
  const lb=document.querySelector('#lariatBtn');
  lb.disabled=false;
+ document.querySelector('#pauseBtn').classList.remove('hidden');
  
  document.querySelector('#lariatLabel').textContent='ダブルラリアット';
  document.querySelector('#lariatStatus').textContent='READY';
@@ -121,7 +125,7 @@ function reset(){
  rafId=requestAnimationFrame(now=>loop(token,now));
 }
 function jump(){
- if(titleMode)return;
+ if(titleMode||paused)return;
  if(!run){
    if(!gameOverRetryReady)return;
    gameOverRetryReady=false;initAudio();sfxStart();startBgm('game');reset();return;
@@ -129,7 +133,7 @@ function jump(){
  if(p.jumps<2){p.vy=p.jumps? -13.0:-14.8;p.jumps++;sfxJump();p.on=false;makeDust(p.x+10,p.y+p.h,3)}
 }
 function useLariat(){
- if(!run || lariatCooldown>0 || lariatTimer>0)return;
+ if(!run || paused || lariatCooldown>0 || lariatTimer>0)return;
  lariatTimer=GAME_CONFIG.lariatDurationFrames;
   lariatCooldown=GAME_CONFIG.lariatCooldownFrames;updateItemHud();
  lariatEndInvuln=0;
@@ -320,6 +324,7 @@ function die(){
    return;
  }
   gameOverRetryReady=false;
+  document.querySelector('#pauseBtn').classList.add('hidden');
   stopBgm();sfxDamage();setTimeout(sfxGameOver,240);
   run=false;
   const score=Math.floor(dist);
@@ -633,6 +638,80 @@ document.body.classList.add('titleOnly');
 document.body.classList.remove('gameOnly');
 startTitleDemo();
 
+function closePauseRanking(){
+  pauseRankingOpen=false;
+  document.querySelector('#scoreModal').classList.add('hidden');
+  document.body.classList.remove('scoreModalOpen');
+}
+function showPauseMenu(){
+  pauseConfirmAction=null;
+  document.querySelector('#pauseConfirm').classList.add('hidden');
+  document.querySelector('#pauseMenu').classList.remove('hidden');
+}
+function openPause(){
+  if(titleMode||!run||paused)return;
+  paused=true;
+  if(rafId!==null){cancelAnimationFrame(rafId);rafId=null;}
+  stopBgm();
+  showPauseMenu();
+  document.querySelector('#pauseOverlay').classList.remove('hidden');
+}
+function resumeFromPause(){
+  if(!paused)return;
+  if(pauseRankingOpen)closePauseRanking();
+  paused=false;
+  pauseConfirmAction=null;
+  document.querySelector('#pauseOverlay').classList.add('hidden');
+  resetFrameClock();
+  startBgm(lariatTimer>0?'lariat':'game');
+  const token=gameToken;
+  if(rafId===null)rafId=requestAnimationFrame(now=>loop(token,now));
+}
+function requestPauseConfirmation(action){
+  if(!paused)return;
+  pauseConfirmAction=action;
+  const restarting=action==='restart';
+  document.querySelector('#pauseMenu').classList.add('hidden');
+  document.querySelector('#pauseConfirm').classList.remove('hidden');
+  document.querySelector('#pauseConfirmTitle').textContent=restarting?'最初からリスタートしますか？':'タイトルへ戻りますか？';
+  document.querySelector('#pauseConfirmText').textContent='現在のプレイ内容は失われ、ランキングには保存されません。';
+  document.querySelector('#pauseConfirmOk').textContent=restarting?'リスタート':'タイトルへ戻る';
+}
+function returnToTitle(){
+  paused=false;pauseConfirmAction=null;
+  run=false;
+  titleMode=true;
+  lariatTimer=0;
+  lariatCooldown=0;
+  lariatEndInvuln=0;
+  shakeTimer=0;
+
+  const msg=document.querySelector('#msg');
+  if(msg)msg.classList.add('hidden');
+  document.querySelector('#pauseOverlay').classList.add('hidden');
+  document.querySelector('#scoreModal').classList.add('hidden');
+  document.querySelector('#debugModal').classList.add('hidden');
+  document.querySelector('#pauseBtn').classList.add('hidden');
+
+  pauseRankingOpen=false;
+  document.body.classList.remove('gameOnly');
+  document.body.classList.remove('scoreModalOpen');
+  document.body.classList.add('titleOnly');
+  startBgm('title');
+  startTitleDemo();
+}
+function restartGame(){
+  paused=false;pauseConfirmAction=null;pauseRankingOpen=false;
+  initAudio();sfxStart();startBgm('game');
+  document.querySelector('#pauseOverlay').classList.add('hidden');
+  document.querySelector('#scoreModal').classList.add('hidden');
+  document.body.classList.remove('scoreModalOpen');
+  titleMode=false;
+  document.body.classList.remove('titleOnly');
+  document.body.classList.add('gameOnly');
+  reset();
+}
+
 document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
@@ -667,8 +746,11 @@ document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
   sfxButton();
-  document.querySelector('#scoreModal').classList.add('hidden');
-  document.body.classList.remove('scoreModalOpen');
+  if(pauseRankingOpen)closePauseRanking();
+  else{
+    document.querySelector('#scoreModal').classList.add('hidden');
+    document.body.classList.remove('scoreModalOpen');
+  }
 });
 document.querySelector('#debugBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();if(!DEBUG_BUILD)return;sfxButton();renderDebugSettings();setDebugStatus('');document.querySelector('#debugModal').classList.remove('hidden');
@@ -699,24 +781,7 @@ document.querySelector('#debugReset').addEventListener('pointerdown',e=>{
 document.querySelector('#titleReturnBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();sfxButton();
-
-  run=false;
-  titleMode=true;
-  lariatTimer=0;
-  lariatCooldown=0;
-  lariatEndInvuln=0;
-  shakeTimer=0;
-
-  const msg=document.querySelector('#msg');
-  if(msg)msg.classList.add('hidden');
-  document.querySelector('#scoreModal').classList.add('hidden');
-  document.querySelector('#debugModal').classList.add('hidden');
-
-  document.body.classList.remove('gameOnly');
-  document.body.classList.remove('scoreModalOpen');
-  document.body.classList.add('titleOnly');
-  startBgm('title');
-  startTitleDemo();
+  returnToTitle();
 });
 
 document.querySelector('#retryBtn').addEventListener('pointerdown',e=>{
@@ -742,12 +807,42 @@ document.querySelector('#gameOverScoreBtn').addEventListener('pointerdown',e=>{
   showScores();
 });
 
+document.querySelector('#pauseBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();initAudio();sfxButton();openPause();
+});
+document.querySelector('#pauseResumeBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();sfxButton();resumeFromPause();
+});
+document.querySelector('#pauseScoreBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();if(!paused)return;sfxButton();pauseRankingOpen=true;document.body.classList.add('scoreModalOpen');showScores();
+});
+document.querySelector('#pauseRestartBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();sfxButton();requestPauseConfirmation('restart');
+});
+document.querySelector('#pauseTitleBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();sfxButton();requestPauseConfirmation('title');
+});
+document.querySelector('#pauseConfirmCancel').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();sfxButton();showPauseMenu();
+});
+document.querySelector('#pauseConfirmOk').addEventListener('pointerdown',e=>{
+  e.preventDefault();e.stopPropagation();
+  const action=pauseConfirmAction;if(!action)return;
+  if(action==='restart')restartGame();
+  else{ sfxButton();returnToTitle(); }
+});
+
 document.addEventListener('pointerdown',()=>{
   initAudio();
   if(titleMode)startBgm('title');
 },{once:true});
 document.addEventListener('keydown',initAudio,{once:true});
 document.addEventListener('keydown',e=>{
+  if(e.code==='Escape'&&!e.repeat){
+    if(pauseRankingOpen){sfxButton();closePauseRanking();return;}
+    if(paused){sfxButton();resumeFromPause();return;}
+    if(run&&!titleMode){sfxButton();openPause();return;}
+  }
   if(e.code!=='KeyD' || e.repeat)return;
   debugHitboxes=!debugHitboxes;
   if(!run)draw();
