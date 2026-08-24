@@ -1,6 +1,3 @@
-let best=Number(localStorage.getItem('jumpRunnerBest')||0);
-let bestTotal=Number(localStorage.getItem('zangiefAnimalBestTotalV2')||0);
-
 let titleMode=true;
 
 const titleDemoCanvas=document.querySelector('#titleDemo');

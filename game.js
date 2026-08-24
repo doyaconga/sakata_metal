@@ -328,9 +328,7 @@ function die(){
   run=false;
   const score=Math.floor(dist);
   const totalScore=getTotalScore();
-  if(score>best){best=score;localStorage.setItem('jumpRunnerBest',String(best));}
-  if(totalScore>bestTotal){bestTotal=totalScore;localStorage.setItem('zangiefAnimalBestTotalV2',String(bestTotal));}
-  saveScoreRecord({totalScore,distance:score,defeated:scoreState.defeated,bestCombo:scoreState.bestCombo,bonus:scoreState.bonus,savedAt:new Date().toISOString()});
+  saveScoreRecord({totalScore,distance:score,defeated:scoreState.defeated,bestCombo:scoreState.bestCombo,bonus:scoreState.bonus});
   document.querySelector('#gameOverContent').innerHTML=`
     <b class="gameOverTitle">GAME OVER</b>
     <div class="gameOverTotalLabel">TOTAL SCORE</div>
