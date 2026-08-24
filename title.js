@@ -125,7 +125,11 @@ function stopTitleDemo(){
 function getScores(){
   try{
     const a=JSON.parse(localStorage.getItem('zangiefAnimalTop10V2')||'[]');
-    return Array.isArray(a)?a.filter(r=>r&&Number.isFinite(r.totalScore)).sort((a,b)=>b.totalScore-a.totalScore).slice(0,10):[];
+    return Array.isArray(a)?a
+      .filter(r=>r&&Number.isFinite(r.totalScore))
+      .map(r=>({totalScore:r.totalScore}))
+      .sort((a,b)=>b.totalScore-a.totalScore)
+      .slice(0,10):[];
   }catch(e){return []}
 }
 function saveScoreRecord(record){
@@ -153,7 +157,9 @@ function showScores(){
     scores.forEach((r,i)=>{
       const row=document.createElement('div');
       row.className='scoreRow';
-      row.innerHTML='<span class="scoreRank">'+(i+1)+'.</span><span class="scoreValue">'+fmt(r.totalScore)+'<small>　'+r.distance+'m / +'+fmt(r.bonus)+'</small></span>';
+      const rank=document.createElement('span');rank.className='scoreRank';rank.textContent=(i+1)+'.';
+      const value=document.createElement('span');value.className='scoreValue';value.textContent=fmt(r.totalScore);
+      row.append(rank,value);
       list.appendChild(row);
     });
   }

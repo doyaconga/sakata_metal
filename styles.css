@@ -56,7 +56,6 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 .scoreRow{display:flex;justify-content:space-between;gap:16px;padding:4px 8px;border-bottom:1px solid #cdbfae}
 .scoreRank{min-width:42px}
 .scoreValue{font-variant-numeric:tabular-nums}
-.scoreValue small{display:block;font-size:11px;color:#6b5a48;font-weight:800;margin-top:2px}
 
 
 #gameShell{width:100%;height:100%}

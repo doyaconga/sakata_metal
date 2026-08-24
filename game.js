@@ -328,7 +328,7 @@ function die(){
   run=false;
   const score=Math.floor(dist);
   const totalScore=getTotalScore();
-  saveScoreRecord({totalScore,distance:score,defeated:scoreState.defeated,bestCombo:scoreState.bestCombo,bonus:scoreState.bonus});
+  saveScoreRecord({totalScore});
   document.querySelector('#gameOverContent').innerHTML=`
     <b class="gameOverTitle">GAME OVER</b>
     <div class="gameOverTotalLabel">TOTAL SCORE</div>
