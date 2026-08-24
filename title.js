@@ -130,10 +130,15 @@ function getScores(){
 }
 function saveScoreRecord(record){
   if(!record||!Number.isFinite(record.totalScore)||record.totalScore<=0)return;
-  const a=getScores();
-  a.push(record);
-  a.sort((a,b)=>b.totalScore-a.totalScore);
-  localStorage.setItem('zangiefAnimalTop10V2',JSON.stringify(a.slice(0,10)));
+  try{
+    const a=getScores();
+    a.push(record);
+    a.sort((a,b)=>b.totalScore-a.totalScore);
+    localStorage.setItem('zangiefAnimalTop10V2',JSON.stringify(a.slice(0,10)));
+  }catch(e){
+    // Saving a score is optional; game-over handling must continue even when
+    // browser storage is unavailable or full.
+  }
 }
 function showScores(){
   const list=document.querySelector('#scoreList');
