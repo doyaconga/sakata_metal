@@ -1,0 +1,20 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+
+# Local development dependencies and generated output
+node_modules/
+dist/
+coverage/
+
