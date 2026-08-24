@@ -1,0 +1,396 @@
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#111;font-family:system-ui,sans-serif}
+body{display:grid;place-items:center}#wrap{position:relative;width:min(100vw,960px);aspect-ratio:16/9;max-height:100vh;overflow:hidden;touch-action:none}
+canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointer-events:none;color:white;text-shadow:2px 2px #000}
+#score{position:absolute;left:18px;top:14px;font-size:24px;font-weight:950}#sub{position:absolute;left:18px;top:47px;font-size:13px;line-height:1.35;font-weight:800}
+#banner{position:absolute;left:50%;top:27%;transform:translate(-50%,-50%);font-size:40px;font-weight:950;opacity:0;transition:opacity .2s;text-align:center}
+#banner.show{opacity:1}#msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:800}.hidden{display:none!important}
+#panel{width:min(520px,calc(100% - 36px));min-height:410px;box-sizing:border-box;background:#000a;padding:32px 34px;border-radius:16px;display:flex;flex-direction:column;justify-content:center}#panel b{display:block;font-size:32px;margin-bottom:8px}
+#lariatWrap{position:absolute;right:18px;bottom:18px;pointer-events:auto}
+#lariatBtn{
+  position:relative;
+  border:2px solid #fff;
+  background:#7a2020;
+  color:#fff;
+  font-weight:900;
+  font-size:15px;
+  padding:9px 13px 10px;
+  border-radius:10px;
+  box-shadow:0 2px 0 #3d0d0d;
+  cursor:pointer;
+  min-width:175px;
+}
+#lariatLabel{display:block}
+#lariatGauge{display:block;height:7px;margin-top:7px;background:#3a1111;border-radius:99px;overflow:hidden}
+#lariatFill{display:block;width:100%;height:100%;background:#eee;transform-origin:left center;transform:scaleX(1)}
+#activeGauge{display:none;height:7px;margin-top:5px;background:#2a0b0b;border-radius:99px;overflow:hidden}
+#activeFill{display:block;width:100%;height:100%;background:#f2c94c;transform-origin:left center;transform:scaleX(1)}
+#lariatBtn.activeNow #activeGauge{display:block}
+#lariatBtn.activeNow #lariatGauge{display:none}
+
+#lariatStatus{display:block;margin-top:4px;font-size:10px;letter-spacing:1px;color:#ddd}
+#lariatBurst{display:none}
+#lariatBtn:disabled{opacity:.65;cursor:default;box-shadow:none}
+
+
+
+
+/* ⑩ 強フラッシュ */
+
+
+/* ⑪ フラッシュからカットインへ */
+
+
+
+
+
+#cutin.show 
+#cutin.show 
+
+
+
+/* ⑫ 目のアップカットイン */
+
+
+
+
+/* Storyboard timeline: total 3.85s */
+#cutin.show 
+#cutin.show 
+#cutin.show 
+#cutin.show 
+
+/* 0–13% = 0.50s */
+/* 13–19.5% = 0.25s */
+/* 19.5–25.7% = 0.15 + 0.20s */
+/* 25.7–30.9% = 0.10 + 0.10s */
+/* 30.9–56.9% = exact 1.00s complete blackout */
+/* 56.9–60.8% = 0.15s flash */
+
+/* 60.8–66% = flash-to-impact */
+
+/* 60.8% onwards giant face */
+
+
+
+
+
+
+
+
+
+
+
+
+#scoreModal{
+  position:absolute;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.72);
+}
+#scoreModal.hidden{display:none}
+#scorePanel{
+  width:min(420px,84%);padding:24px 28px;
+  background:#f5efe3;border:4px solid #2b211b;border-radius:16px;
+  text-align:center;
+}
+#scoreTitle{font-size:30px;font-weight:1000;margin-bottom:15px}
+#scoreList{
+  width:min(300px,100%);
+  margin:0 auto 18px;
+  text-align:left;
+  font-size:18px;
+  font-weight:800;
+  line-height:1.55;
+}
+
+#scoreClose{width:160px;font-size:16px}
+.scoreRow{display:flex;justify-content:space-between;gap:16px;padding:4px 8px;border-bottom:1px solid #cdbfae}
+.scoreRank{min-width:42px}
+.scoreValue{font-variant-numeric:tabular-nums}
+.scoreValue small{display:block;font-size:11px;color:#6b5a48;font-weight:800;margin-top:2px}
+
+
+.hiddenGame{display:none!important}
+#gameShell{width:100%;height:100%}
+
+body.titleOnly{
+  overflow:hidden;
+}
+body.titleOnly #gameShell{display:none!important}
+body.gameOnly 
+body.gameOnly #gameShell{display:block!important}
+
+
+
+
+
+body.gameOnly:not(.scoreModalOpen) #scoreModal{display:none!important}
+body.gameOnly.scoreModalOpen #scoreModal{
+  display:flex!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:4000!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+body.gameOnly 
+body.gameOnly #gameShell{display:block!important}
+body.titleOnly 
+body.titleOnly #gameShell{display:none!important}
+
+
+#msg{pointer-events:auto}
+#panel{pointer-events:auto}
+
+
+body.titleOnly #scoreModal:not(.hidden){
+  display:flex!important;
+  z-index:300!important;
+}
+body.titleOnly 
+
+
+#gameOverButtons{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:0;
+  width:100%;
+  margin:0 auto;
+  pointer-events:auto;
+}
+#gameOverMainButtons{display:flex;justify-content:center;gap:12px;width:100%;margin-top:32px;margin-bottom:32px}
+#retryBtn,#gameOverScoreBtn,#titleReturnBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:0;
+  padding:11px 14px;
+  width:170px;
+  min-width:0;
+  box-sizing:border-box;
+  border:3px solid #fff;
+  border-radius:12px;
+  color:#fff;
+  font-size:16px;
+  font-weight:1000;
+  cursor:pointer;
+  pointer-events:auto;
+  white-space:nowrap;
+}
+#retryBtn{
+  background:#35652f;
+  box-shadow:0 3px 0 #173b14;
+}
+#gameOverScoreBtn{background:#315271;box-shadow:0 3px 0 #172b3c}
+#titleReturnBtn{
+  background:#7a2020;
+  box-shadow:0 3px 0 #3b0c0c;
+  width:352px;
+  max-width:100%;
+}
+#gameOverContent .gameOverTitle{display:block;font-size:30px;margin-bottom:10px}
+#gameOverContent .gameOverTotalLabel{font-size:17px;font-weight:900;color:#ffe45c}
+#gameOverContent .gameOverTotal{font-size:46px;line-height:1.08;font-weight:1000;color:#fff;margin:2px 0 13px}
+#gameOverContent .gameOverStats{font-size:19px;line-height:1.55;font-weight:900}
+
+
+#titleScreen{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+  background:#111;
+}
+
+#titleBottom{
+  position:relative;
+  z-index:5;
+  pointer-events:auto;
+  flex:0 0 auto;
+  order:1;
+  background:rgba(243,234,219,.94);
+  border-bottom:4px solid #2f241c;
+  padding:12px 16px 13px;
+  text-align:center;
+}
+#gameTitle{
+  color:#742020;
+  font-size:30px;
+  font-weight:1000;
+  line-height:1.1;
+  margin-bottom:10px;
+  text-shadow:2px 2px 0 #fff;
+}
+#titleButtons{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+}
+#startBtn,#scoreBtn{
+  width:190px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  pointer-events:auto;
+  padding:12px 18px;
+  border:3px solid #f4e4bf;
+  border-radius:10px;
+  color:#fff;
+  font-size:20px;
+  font-weight:1000;
+  cursor:pointer;
+}
+#startBtn{background:#9d211d;box-shadow:0 3px 0 #4b0d0b}
+#scoreBtn{background:#315271;box-shadow:0 3px 0 #172b3c}
+#debugBtn{position:absolute;right:12px;bottom:12px;padding:7px 10px;border:2px solid #ede4d6;border-radius:8px;background:#4b4b4b;color:#fff;font-size:12px;font-weight:900;cursor:pointer}
+#debugModal{position:fixed;inset:0;z-index:3600;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.78);padding:16px;pointer-events:auto}
+#debugModal.hidden{display:none!important}
+#debugPanel{width:min(620px,96vw);max-height:90vh;overflow:auto;padding:18px 20px;background:#f5efe3;border:4px solid #2b211b;border-radius:16px;color:#2b211b;text-align:left}
+#debugTitle{font-size:25px;font-weight:1000;text-align:center;margin-bottom:4px}
+#debugNote{font-size:12px;font-weight:800;text-align:center;color:#725f4d;margin-bottom:14px}
+#debugFields{display:grid;grid-template-columns:1fr 120px;gap:8px 12px;align-items:center}
+.debugLabel{font-size:14px;font-weight:900}.debugInput{width:100%;padding:7px;border:2px solid #9e8b75;border-radius:7px;background:#fff;font-size:16px;font-weight:800;text-align:right}
+#debugAnimalSection{margin-top:18px;padding:12px;border:2px solid #9e8b75;border-radius:10px;background:#fff9ed}
+#debugAnimalTitle{font-size:16px;font-weight:1000;margin-bottom:8px;text-align:center}
+#debugAnimalChecks{display:grid;grid-template-columns:repeat(3,1fr);gap:7px 10px}
+.debugAnimalCheck{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:900}.debugAnimalCheck input{width:18px;height:18px}
+#debugAnimalButtons{display:flex;justify-content:center;gap:8px;margin-top:10px}#debugAnimalButtons button{padding:7px 12px;border:2px solid #2b211b;border-radius:7px;background:#665747;color:#fff;font-weight:900;cursor:pointer}
+#debugActions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:16px}
+#debugActions button{min-width:130px;padding:9px 12px;border:2px solid #2b211b;border-radius:8px;color:#fff;font-weight:900;cursor:pointer}
+#debugApply{background:#35652f}#debugReset{background:#9d6b20}#debugClose{background:#555}
+#debugStatus{text-align:center;min-height:20px;margin-top:10px;color:#35652f;font-size:13px;font-weight:900}
+@media(max-width:620px){#debugBtn{right:7px;bottom:7px;font-size:10px;padding:6px 8px}#debugPanel{padding:14px}#debugFields{grid-template-columns:1fr 95px;gap:7px}.debugLabel{font-size:12px}.debugInput{font-size:14px}#debugAnimalChecks{grid-template-columns:repeat(2,1fr)}}
+body.titleOnly #titleScreen{display:flex!important}
+body.gameOnly #titleScreen{display:none!important}
+body.titleOnly #gameShell{display:none!important}
+body.gameOnly #gameShell{display:block!important}
+body.titleOnly #scoreModal:not(.hidden){display:flex!important;z-index:2000!important}
+
+
+#titleFaces{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(255,255,255,.18),transparent 34%),
+    linear-gradient(180deg,#78bceb 0%,#b8ddf5 55%,#d7b078 56%,#8c5b36 100%);
+}
+#titleFaces::before{
+  content:"";
+  position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:
+    linear-gradient(180deg,rgba(61,116,65,.95) 0 18%,rgba(79,132,70,.95) 19% 28%,transparent 29%),
+    repeating-linear-gradient(90deg,transparent 0 110px,rgba(255,255,255,.08) 111px 112px);
+}
+#titleFaces .face{
+  display:none;
+  position:absolute;
+  width:120px;height:120px;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 0 rgba(0,0,0,.35));
+  transform-origin:center;
+}
+#titleFaces .f1{left:7%;top:12%;transform:rotate(-12deg) scale(1.05)}
+#titleFaces .f2{right:8%;top:10%;transform:rotate(11deg) scale(.95)}
+#titleFaces .f3{left:20%;bottom:10%;transform:rotate(7deg) scale(.82)}
+#titleFaces .f4{right:21%;bottom:9%;transform:rotate(-8deg) scale(.86)}
+#titleFaces .f5{left:50%;top:43%;transform:translate(-50%,-50%) scale(1.45)}
+#titleFaces .f6{left:50%;bottom:-16px;transform:translateX(-50%) rotate(4deg) scale(.72)}
+
+#titleDemoWrap{
+  position:relative;
+  z-index:6;
+  order:2;
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 18px 14px;
+  pointer-events:none;
+}
+#titleDemo{
+  display:block;
+  width:min(88%,720px);
+  height:auto;
+  max-height:100%;
+  aspect-ratio:720/300;
+  border:3px solid rgba(47,36,28,.82);
+  border-radius:14px;
+  background:rgba(220,239,249,.90);
+  box-shadow:0 5px 0 rgba(47,36,28,.32);
+}
+@media (max-height:430px), (max-width:620px){
+  #titleBottom{padding:7px 10px 9px}
+  #gameTitle{font-size:clamp(18px,4.6vw,25px);margin-bottom:7px}
+  #titleButtons{gap:10px}
+  #startBtn,#scoreBtn{width:min(38vw,170px);min-height:44px;padding:8px 12px;font-size:clamp(15px,3.4vw,18px)}
+  #titleDemoWrap{padding:7px 10px 9px}
+  #titleDemo{width:min(94%,720px)}
+  #titleFaces .f1,#titleFaces .f2,#titleFaces .f3,#titleFaces .f4{opacity:.42}
+  #titleFaces .f5,#titleFaces .f6{opacity:.18}
+}
+
+
+html,body{
+  width:100%;
+  height:100%;
+  margin:0;
+}
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#111;
+}
+#titleScreen{
+  position:relative;
+  inset:auto;
+  width:min(960px,100vw);
+  height:min(540px,100vh);
+  aspect-ratio:960/540;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#111;
+  box-sizing:border-box;
+}
+#gameShell{
+  position:relative;
+  width:min(960px,100vw);
+  height:min(540px,100vh);
+  aspect-ratio:960/540;
+  overflow:hidden;
+  margin:auto;
+}
+#gameShell #wrap{
+  width:100%;
+  height:100%;
+  margin:0;
+}
+#gameShell canvas{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+body.titleOnly #titleScreen{display:flex!important}
+body.titleOnly #gameShell{display:none!important}
+body.gameOnly #titleScreen{display:none!important}
+body.gameOnly #gameShell{display:block!important}
+
+
+#scoreModal{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  align-items:center;
+  justify-content:center;
+}
+
+#meatHud{position:absolute;left:18px;top:105px;font-size:17px;font-weight:900;color:#fff;text-shadow:2px 2px #000}
