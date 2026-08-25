@@ -23,6 +23,7 @@ const GAME_CONFIG={
   cycloneTargetCount:30,
   cyclonePieceIntervalMin:200,
   cyclonePieceIntervalMax:700,
+  cycloneCompleteHoldFrames:24,
   cycloneEscapeMaxFrames:120,
   cycloneCountdownStepFrames:42,
   chargeRecoveryRatio:.20,

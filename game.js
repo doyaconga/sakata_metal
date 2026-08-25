@@ -69,11 +69,40 @@ function chargeInterval(){
 function cyclonePieceInterval(){
   return GAME_CONFIG.cyclonePieceIntervalMin+Math.random()*(GAME_CONFIG.cyclonePieceIntervalMax-GAME_CONFIG.cyclonePieceIntervalMin);
 }
+function updateCycloneMeter(){
+  const meter=document.querySelector('#cycloneMeter');
+  const slots=document.querySelector('#cycloneSlots');
+  if(!meter||!slots)return;
+  const required=GAME_CONFIG.cycloneRequiredPieces;
+  if(slots.children.length!==required){
+    slots.innerHTML='';
+    for(let i=0;i<required;i++){
+      const slot=document.createElement('span');
+      slot.className='cycloneSlot';slot.textContent='🌪';slot.style.setProperty('--slot-index',i);
+      slots.appendChild(slot);
+    }
+  }
+  const charged=cycloneState==='complete'||cycloneState==='escape';
+  const visible=cycloneState==='idle'||charged;
+  const filled=charged?required:Math.min(cyclonePieces,required);
+  const pulseDurations=[1.6,1.6,1.3,1,.7,.28];
+  meter.classList.toggle('hidden',!visible);
+  meter.classList.toggle('complete',charged);
+  meter.style.setProperty('--cyclone-pulse-duration',(pulseDurations[Math.min(filled,5)]||.28)+'s');
+  meter.setAttribute('aria-label',`サイクロン ${filled} / ${required}`);
+  [...slots.children].forEach((slot,index)=>{
+    const shouldFill=index<filled;
+    const wasFilled=slot.classList.contains('filled');
+    slot.classList.toggle('filled',shouldFill);
+    if(!shouldFill)slot.classList.remove('justFilled');
+    else if(!wasFilled)slot.classList.add('justFilled');
+  });
+}
 function updateItemHud(){
   const parts=[];
   if(meatShield>0)parts.push(`🛡 GUARD ×${meatShield}`);
-  if(cyclonePieces>0)parts.push(cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces?'🌪 CYCLONE READY!':`🌪 CYCLONE ${cyclonePieces} / ${GAME_CONFIG.cycloneRequiredPieces}`);
   document.querySelector('#meatHud').textContent=parts.join('　');
+  updateCycloneMeter();
 }
 function syncLariatReadyUi(){
   if(lariatCooldown>0 || lariatTimer>0)return;
@@ -109,10 +138,17 @@ function beginCycloneCountdown(){
   cycloneState='countdown';
   cycloneTimer=GAME_CONFIG.cycloneCountdownStepFrames*4;
   cycloneCountdownLabel='3';
+  updateCycloneMeter();
   showCycloneOverlay('countdown','3');
 }
-function beginCyclonePreparation(){
+function beginCycloneCompletion(){
   if(cycloneState!=='idle'||cyclonePieces<GAME_CONFIG.cycloneRequiredPieces||lariatTimer>0)return;
+  cycloneState='complete';
+  cycloneTimer=GAME_CONFIG.cycloneCompleteHoldFrames;
+  updateCycloneMeter();
+}
+function beginCyclonePreparation(){
+  if((cycloneState!=='idle'&&cycloneState!=='complete')||cyclonePieces<GAME_CONFIG.cycloneRequiredPieces||lariatTimer>0)return;
   cyclonePieces=0;
   cycloneState='escape';
   cycloneTimer=GAME_CONFIG.cycloneEscapeMaxFrames;
@@ -170,9 +206,15 @@ function finishCycloneScoring(){
   nextCyclonePieceAt=dist+cyclonePieceInterval();
   spawnTimer=180;
   document.querySelector('#lariatLabel').textContent='ダブルラリアット';
+  updateItemHud();
 }
 function updateCyclonePreparation(){
   updateScoreEffects();
+  if(cycloneState==='complete'){
+    cycloneTimer--;
+    if(cycloneTimer<=0)beginCyclonePreparation();
+    return;
+  }
   if(cycloneState==='escape'){
     for(const o of obs)o.x-=speed*2;
     obs=obs.filter(o=>o.x+o.w>-80);
@@ -225,7 +267,7 @@ function reset(){
  rafId=requestAnimationFrame(now=>loop(token,now));
 }
 function jump(){
- if(titleMode||paused||cycloneState==='escape'||cycloneState==='countdown')return;
+ if(titleMode||paused||cycloneState==='complete'||cycloneState==='escape'||cycloneState==='countdown')return;
  if(!run){
    if(!gameOverRetryReady)return;
    gameOverRetryReady=false;initAudio();sfxStart();startBgm('game');reset();return;
@@ -498,7 +540,7 @@ function updateGameOverExplosion(){
   gameOverFragments=gameOverFragments.filter(f=>f.life>0&&f.y<H+80);
 }
 function update(){
- if(cycloneState==='escape'||cycloneState==='countdown'){updateCyclonePreparation();return;}
+ if(cycloneState==='complete'||cycloneState==='escape'||cycloneState==='countdown'){updateCyclonePreparation();return;}
  const cycloneActive=cycloneState==='active';
  if(!cycloneActive)dist+=speed/12;
  groundOffset=(groundOffset+speed)%10000;
@@ -559,7 +601,7 @@ function update(){
    }
  }
  if(!cycloneActive&&cycloneState==='idle'&&cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces&&lariatTimer<=0){
-   beginCyclonePreparation();
+   beginCycloneCompletion();
    return;
  }
  if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0)spawnPattern();
@@ -588,7 +630,6 @@ function update(){
      }
      else if(it.type==='cyclonePiece'){
        cyclonePieces=Math.min(GAME_CONFIG.cycloneRequiredPieces,cyclonePieces+1);
-       scoreEffects.push({type:'itemNotice',text:`🌪 CYCLONE ${cyclonePieces} / ${GAME_CONFIG.cycloneRequiredPieces}`,color:'#8ff5ff',life:100,maxLife:100});
        if(cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces){
          lariatCooldown=0;
          syncLariatReadyUi();
@@ -601,6 +642,10 @@ function update(){
      updateItemHud();
      sfxButton();
    }
+ }
+ if(!cycloneActive&&cycloneState==='idle'&&cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces&&lariatTimer<=0){
+   beginCycloneCompletion();
+   return;
  }
 
  for(const o of obs){
