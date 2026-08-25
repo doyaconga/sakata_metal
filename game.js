@@ -386,6 +386,20 @@ function spawnPattern(){
      base=Math.max(base,rightmostBird+460);
    }
  }
+ // A fast cat can otherwise reach the player while the tail of a high bat
+ // flock is still overhead, demanding both "stay low" and "jump" at once.
+ // Predict both arrival times and preserve a short reaction window after the
+ // bats have fully passed. This scales with the current stage speed.
+ if(pat.some(entry=>entry.t==='cat')){
+   const activeBats=obs.filter(o=>o.type==='bats'&&!o.flying&&o.x+o.w>p.x);
+   if(activeBats.length){
+     const rightmostBat=Math.max(...activeBats.map(o=>o.x+o.w));
+     const batTailFrames=Math.max(0,(rightmostBat-p.x)/speed);
+     const catSpeed=speed*GAME_CONFIG.catSpeedMultiplier;
+     const safeCatBase=p.x+catSpeed*(batTailFrames+GAME_CONFIG.catAfterBatsSafeFrames);
+     base=Math.max(base,safeCatBase);
+   }
+ }
  let max=0;
  const pid=patternSeq++;
  for(const q of pat){
