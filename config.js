@@ -26,6 +26,7 @@ const GAME_CONFIG={
   cycloneSpinUpFrames:90,
   cycloneSpinStartSpeed:.035,
   cycloneSpinSpeed:.55,
+  cycloneResultFanfareFrames:66,
   cycloneEscapeMaxFrames:120,
   cycloneCountdownStepFrames:42,
   chargeRecoveryRatio:.20,

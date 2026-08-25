@@ -106,10 +106,34 @@ function drawSeasonScenery(sn){
  }
  x.restore();
 }
+function drawCycloneRainbowSky(){
+  const colors=['#ff4f7b','#ff914d','#ffe55c','#65e889','#52cffa','#7868ed','#c05be8'];
+  const bandHeight=68;
+  const scroll=groundOffset*2.8;
+  const cycle=bandHeight*colors.length;
+  const modulo=(value,size)=>((value%size)+size)%size;
+  x.save();
+  x.beginPath();x.rect(0,0,W,G);x.clip();
+  // Paint every narrow column from top to bottom with the same repeating
+  // seven-color cycle. Unlike overlapping polygons, this cannot expose a
+  // fallback color when a moving wave crosses the edge of the canvas.
+  const columnWidth=4;
+  for(let px=0;px<W;px+=columnWidth){
+    const movingX=px+scroll;
+    const waveOffset=modulo(-movingX*.22+Math.sin(movingX/58)*13,cycle);
+    for(let band=-8;band<9;band++){
+      const py=band*bandHeight+waveOffset;
+      x.fillStyle=colors[modulo(band,colors.length)];
+      x.fillRect(px,py,columnWidth+1,bandHeight+1);
+    }
+  }
+  x.restore();
+}
 function draw(){
  x.save();
+ const cycloneVisual=cycloneState==='active';
  const lariatPower=lariatTimer>GAME_CONFIG.lariatWarningFrames?1:(lariatTimer>0?Math.max(.05,lariatTimer/GAME_CONFIG.lariatWarningFrames):0);
- if(lariatTimer>0){
+ if(lariatTimer>0&&!cycloneVisual){
    // Violent lariat shake: both translation and a tiny rotation.
    const mag=15*lariatPower;
    const sx=(Math.random()-.5)*mag;
@@ -120,10 +144,14 @@ function draw(){
    x.translate(-W/2+sx,-H/2+sy);
  }
  let ph=phase(),sn=season(),s=skies[ph],g=x.createLinearGradient(0,0,0,H);
- g.addColorStop(0,`rgb(${s[0]},${s[1]},${s[2]})`);g.addColorStop(1,`rgb(${Math.max(0,s[0]-30)},${Math.max(0,s[1]-20)},${Math.max(0,s[2]-5)})`);
- x.fillStyle=g;x.fillRect(0,0,W,H);
+ if(cycloneVisual){
+   drawCycloneRainbowSky();
+ }else{
+   g.addColorStop(0,`rgb(${s[0]},${s[1]},${s[2]})`);g.addColorStop(1,`rgb(${Math.max(0,s[0]-30)},${Math.max(0,s[1]-20)},${Math.max(0,s[2]-5)})`);
+   x.fillStyle=g;x.fillRect(0,0,W,H);
+ }
 
- if(lariatTimer>0){
+ if(lariatTimer>0&&!cycloneVisual){
    // Storm overlay: dark clouds, rain, and intermittent lightning.
    const stormAlpha=.62*lariatPower;
    x.fillStyle=`rgba(10,15,28,${stormAlpha})`;x.fillRect(0,0,W,H);
@@ -169,17 +197,19 @@ function draw(){
      x.stroke();
    }else thunderLatch=false;
  }
- // stars / sun / moon
- if(ph===3){x.fillStyle='#fff8';for(let i=0;i<35;i++)x.fillRect((i*137)%W,(i*71)%260,2,2);x.fillStyle='#eef3ff';x.beginPath();x.arc(790,90,32,0,7);x.fill()}
- else{x.fillStyle=ph===2?'#ffcf80':'#ffe789';x.beginPath();x.arc(790,90,40,0,7);x.fill()}
- if(sn!==1){
-  if(sn===0)x.fillStyle='#76aa70';
-  else if(sn===2){const autumnMountains=x.createLinearGradient(0,300,W,370);autumnMountains.addColorStop(0,'#df8b6e');autumnMountains.addColorStop(.52,'#e8b15d');autumnMountains.addColorStop(1,'#d87962');x.fillStyle=autumnMountains}
-  else x.fillStyle='#f4f7f9';
-  x.beginPath();x.moveTo(0,G);x.lineTo(0,355);x.quadraticCurveTo(150,270,300,355);x.quadraticCurveTo(470,255,630,355);x.quadraticCurveTo(800,280,960,350);x.lineTo(960,G);x.fill();
-  if(sn===3){x.strokeStyle='rgba(112,145,160,.38)';x.lineWidth=1.25;x.stroke()}
+ if(!cycloneVisual){
+   // stars / sun / moon
+   if(ph===3){x.fillStyle='#fff8';for(let i=0;i<35;i++)x.fillRect((i*137)%W,(i*71)%260,2,2);x.fillStyle='#eef3ff';x.beginPath();x.arc(790,90,32,0,7);x.fill()}
+   else{x.fillStyle=ph===2?'#ffcf80':'#ffe789';x.beginPath();x.arc(790,90,40,0,7);x.fill()}
+   if(sn!==1){
+    if(sn===0)x.fillStyle='#76aa70';
+    else if(sn===2){const autumnMountains=x.createLinearGradient(0,300,W,370);autumnMountains.addColorStop(0,'#df8b6e');autumnMountains.addColorStop(.52,'#e8b15d');autumnMountains.addColorStop(1,'#d87962');x.fillStyle=autumnMountains}
+    else x.fillStyle='#f4f7f9';
+    x.beginPath();x.moveTo(0,G);x.lineTo(0,355);x.quadraticCurveTo(150,270,300,355);x.quadraticCurveTo(470,255,630,355);x.quadraticCurveTo(800,280,960,350);x.lineTo(960,G);x.fill();
+    if(sn===3){x.strokeStyle='rgba(112,145,160,.38)';x.lineWidth=1.25;x.stroke()}
+   }
+   drawSeasonScenery(sn);
  }
- drawSeasonScenery(sn);
  const groundColors=[['#5b3d2e','#3f8c3a'],['#9c7139','#e3bd62'],['#62402d','#b87532'],['#aebfca','#f7fbff']][sn];
  x.fillStyle=groundColors[0];x.fillRect(0,G,W,H-G);
  x.fillStyle=groundColors[1];x.fillRect(0,G,W,12);

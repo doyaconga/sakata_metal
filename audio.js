@@ -78,6 +78,32 @@ function sfxGameOver(){
 function sfxButton(){
   initAudio();tone(520,.055,'square',.07,650);
 }
+function sfxCycloneResult(){
+  initAudio();
+  if(!audioCtx)return;
+
+  // Short original victory fanfare: a buoyant high-register climb followed
+  // by a sparkling major chord. No crowd or applause layer is used.
+  const phrase=[659.25,783.99,1046.50,1318.51,1567.98];
+  phrase.forEach((note,index)=>{
+    const delay=index*.09;
+    tone(note,.14,'triangle',.115,note*1.06,delay);
+    tone(note*2,.055,'sine',.042,null,delay+.014);
+  });
+  const chordDelay=.45;
+  tone(1046.50,.48,'triangle',.115,1174.66,chordDelay);
+  tone(1318.51,.48,'triangle',.105,1567.98,chordDelay);
+  tone(1567.98,.52,'triangle',.095,2093.00,chordDelay);
+  tone(2093.00,.28,'sine',.06,2637.02,chordDelay+.055);
+
+  // Let the result sound sit in front, then smoothly restore the game BGM.
+  if(bgmGain){
+    const now=audioCtx.currentTime;
+    bgmGain.gain.cancelScheduledValues(now);
+    bgmGain.gain.setValueAtTime(.24,now);
+    bgmGain.gain.linearRampToValueAtTime(.62,now+1.05);
+  }
+}
 
 // ---------- PROCEDURAL BGM ----------
 let bgmMode='none';
@@ -132,7 +158,7 @@ function startBgm(mode){
   bgmMode=mode;
   bgmStep=0;
 
-  const interval = mode==='title' ? 310 : mode==='game' ? 145 : 72;
+  const interval = mode==='title' ? 310 : mode==='game' ? 145 : mode==='cyclone' ? 78 : 72;
   bgmTimer=setInterval(()=>{
     if(!audioCtx||audioCtx.state!=='running')return;
 
@@ -154,6 +180,19 @@ function startBgm(mode){
       bgmTone(i%4===0?110:82.41,.12,'sawtooth',i%4===0?.095:.045);
       if(i%2===0)bgmNoise(.035,.055,2400);
       if(i%4===2)bgmNoise(.055,.07,900);
+
+    }else if(bgmMode==='cyclone'){
+      // Original bright invincibility-style cue: rapid major arpeggios,
+      // bell-like upper sparkles and a light pulse underneath.
+      const melody=[523.25,659.25,783.99,1046.50,880.00,783.99,659.25,987.77,
+                    587.33,698.46,880.00,1174.66,987.77,880.00,698.46,1046.50];
+      const i=bgmStep%melody.length;
+      const note=melody[i];
+      bgmTone(note,.12,'triangle',.13);
+      bgmTone(note*2,.055,'sine',.043,.012);
+      if(i%2===0)bgmTone(note*1.5,.07,'sine',.035,.035);
+      if(i%4===0)bgmTone(i<8?130.81:146.83,.24,'sine',.075);
+      if(i%4===2)bgmTone(392,.08,'triangle',.045,.018);
 
     }else if(bgmMode==='lariat'){
       // Deliberately excessive: pounding lows, dissonant stabs, metallic noise,
