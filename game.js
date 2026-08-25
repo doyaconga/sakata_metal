@@ -78,7 +78,9 @@ function updateCycloneMeter(){
     slots.innerHTML='';
     for(let i=0;i<required;i++){
       const slot=document.createElement('span');
-      slot.className='cycloneSlot';slot.textContent='🌪';slot.style.setProperty('--slot-index',i);
+      slot.className='cycloneSlot';
+      const glyph=document.createElement('span');glyph.className='cycloneGlyph';glyph.textContent='🌪';
+      slot.appendChild(glyph);
       slots.appendChild(slot);
     }
   }
@@ -90,13 +92,26 @@ function updateCycloneMeter(){
   meter.classList.toggle('complete',charged);
   meter.style.setProperty('--cyclone-pulse-duration',(pulseDurations[Math.min(filled,5)]||.28)+'s');
   meter.setAttribute('aria-label',`サイクロン ${filled} / ${required}`);
+  const newlyFilledSlots=[];
   [...slots.children].forEach((slot,index)=>{
     const shouldFill=index<filled;
     const wasFilled=slot.classList.contains('filled');
     slot.classList.toggle('filled',shouldFill);
     if(!shouldFill)slot.classList.remove('justFilled');
-    else if(!wasFilled)slot.classList.add('justFilled');
+    else if(!wasFilled){slot.classList.add('justFilled');newlyFilledSlots.push(slot);}
   });
+  if(newlyFilledSlots.length){
+    void slots.offsetWidth;
+    const firstSlot=slots.querySelector('.cycloneSlot.filled');
+    const referenceAnimation=firstSlot?.getAnimations().find(animation=>animation.animationName==='cycloneMeterPulse');
+    if(referenceAnimation){
+      for(const slot of newlyFilledSlots){
+        if(slot===firstSlot)continue;
+        const pulseAnimation=slot.getAnimations().find(animation=>animation.animationName==='cycloneMeterPulse');
+        if(pulseAnimation)pulseAnimation.currentTime=referenceAnimation.currentTime;
+      }
+    }
+  }
 }
 function updateItemHud(){
   const parts=[];

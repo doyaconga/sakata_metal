@@ -9,8 +9,9 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 #cycloneMeterLabel{font-size:11px;font-weight:1000;letter-spacing:2px;color:#9da7ab;text-shadow:2px 2px #000}
 #cycloneSlots{display:flex;gap:7px}
 .cycloneSlot{display:grid;place-items:center;width:38px;height:38px;border:2px solid #3d494e;border-radius:50%;background:rgba(10,17,20,.82);font-size:25px;line-height:1;filter:grayscale(1) brightness(.23);opacity:.68;transform-origin:center}
-.cycloneSlot.filled{border-color:#a6f6ff;background:radial-gradient(circle,#eafcff 0,#4ccfe0 42%,#174d61 78%);filter:none;opacity:1;color:#fff;text-shadow:0 0 5px #fff,0 0 12px #4eeeff,0 0 20px #35aeea;box-shadow:0 0 8px #62edff,0 0 18px rgba(38,190,255,.7);animation:cycloneMeterPulse var(--cyclone-pulse-duration) ease-in-out infinite alternate;animation-delay:calc(var(--slot-index) * -.07s)}
-.cycloneSlot.filled.justFilled{animation:cycloneSlotAcquire .38s ease-out,cycloneMeterPulse var(--cyclone-pulse-duration) .38s ease-in-out infinite alternate}
+.cycloneGlyph{display:block;line-height:1;transform-origin:center}
+.cycloneSlot.filled{border-color:#a6f6ff;background:radial-gradient(circle,#eafcff 0,#4ccfe0 42%,#174d61 78%);filter:none;opacity:1;color:#fff;text-shadow:0 0 5px #fff,0 0 12px #4eeeff,0 0 20px #35aeea;box-shadow:0 0 8px #62edff,0 0 18px rgba(38,190,255,.7);animation:cycloneMeterPulse var(--cyclone-pulse-duration) ease-in-out infinite alternate}
+.cycloneSlot.filled.justFilled .cycloneGlyph{animation:cycloneSlotAcquire .38s ease-out}
 #cycloneMeter.complete .cycloneSlot.filled{animation-duration:.24s;box-shadow:0 0 13px #fff,0 0 27px #5ff3ff,0 0 38px #ffdc55}
 @keyframes cycloneMeterPulse{from{transform:scale(.94);filter:brightness(.82);box-shadow:0 0 5px #43c9e4,0 0 11px rgba(38,190,255,.45)}to{transform:scale(1.09);filter:brightness(1.35);box-shadow:0 0 13px #a9fbff,0 0 25px rgba(52,220,255,.95)}}
 @keyframes cycloneSlotAcquire{0%{transform:scale(.35) rotate(-35deg);filter:brightness(3)}65%{transform:scale(1.32) rotate(8deg);filter:brightness(1.8)}100%{transform:scale(1);filter:brightness(1)}}
