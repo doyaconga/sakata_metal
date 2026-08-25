@@ -504,7 +504,7 @@ function draw(){
  if(rescueInvuln>0 && Math.floor(rescueInvuln/5)%2===0)x.globalAlpha=.4;
  if(lariatEndInvuln>0 && Math.floor(lariatEndInvuln/5)%2===0)x.globalAlpha=.25;
  x.translate(p.x+p.w/2,p.y+p.h/2);
- const spin=lariatTimer>0 ? (70-lariatTimer)*0.55 : p.rot;
+ const spin=lariatTimer>0&&cycloneState!=='active' ? (70-lariatTimer)*0.55 : p.rot;
  x.rotate(spin);
  if(lariatTimer>0){
    x.strokeStyle='#f4d35e';x.lineWidth=7;x.globalAlpha=.9;

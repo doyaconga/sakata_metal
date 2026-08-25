@@ -38,7 +38,7 @@ function commitDebugInputs(showStatus=true){
 }
 let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0;
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
-let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],nextCyclonePieceAt=350;
+let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,nextCyclonePieceAt=350;
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
@@ -84,7 +84,7 @@ function updateCycloneMeter(){
       slots.appendChild(slot);
     }
   }
-  const charged=cycloneState==='complete'||cycloneState==='escape';
+  const charged=cycloneState==='escape';
   const visible=cycloneState==='idle'||charged;
   const filled=charged?required:Math.min(cyclonePieces,required);
   const pulseDurations=[1.6,1.6,1.3,1,.7,.28];
@@ -156,17 +156,12 @@ function beginCycloneCountdown(){
   updateCycloneMeter();
   showCycloneOverlay('countdown','3');
 }
-function beginCycloneCompletion(){
-  if(cycloneState!=='idle'||cyclonePieces<GAME_CONFIG.cycloneRequiredPieces||lariatTimer>0)return;
-  cycloneState='complete';
-  cycloneTimer=GAME_CONFIG.cycloneCompleteHoldFrames;
-  updateCycloneMeter();
-}
 function beginCyclonePreparation(){
-  if((cycloneState!=='idle'&&cycloneState!=='complete')||cyclonePieces<GAME_CONFIG.cycloneRequiredPieces||lariatTimer>0)return;
+  if(cycloneState!=='idle'||cyclonePieces<GAME_CONFIG.cycloneRequiredPieces||lariatTimer>0)return;
   cyclonePieces=0;
   cycloneState='escape';
   cycloneTimer=GAME_CONFIG.cycloneEscapeMaxFrames;
+  cycloneSpinFrames=0;
   items=[];
   itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;
   nextItemChanceAt=dist+itemChanceInterval(dist);
@@ -217,7 +212,7 @@ function finishCycloneScoring(){
   scoreEffects.push({type:'cycloneResult',combo,bonus,life:150,maxLife:150});
   scoreState.lariatCombo=0;scoreState.lariatBonus=0;
   obs=obs.filter(o=>!o.cyclone);
-  cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];
+  cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;
   nextCyclonePieceAt=dist+cyclonePieceInterval();
   spawnTimer=180;
   document.querySelector('#lariatLabel').textContent='ダブルラリアット';
@@ -225,18 +220,21 @@ function finishCycloneScoring(){
 }
 function updateCyclonePreparation(){
   updateScoreEffects();
-  if(cycloneState==='complete'){
-    cycloneTimer--;
-    if(cycloneTimer<=0)beginCyclonePreparation();
-    return;
-  }
   if(cycloneState==='escape'){
+    cycloneSpinFrames=Math.min(GAME_CONFIG.cycloneSpinUpFrames,cycloneSpinFrames+1);
+    const spinProgress=cycloneSpinFrames/Math.max(1,GAME_CONFIG.cycloneSpinUpFrames);
+    const easedSpin=spinProgress*spinProgress;
+    const spinSpeed=GAME_CONFIG.cycloneSpinStartSpeed+(GAME_CONFIG.cycloneSpinSpeed-GAME_CONFIG.cycloneSpinStartSpeed)*easedSpin;
+    p.rot+=spinSpeed;
     for(const o of obs)o.x-=speed*2;
     obs=obs.filter(o=>o.x+o.w>-80);
     cycloneTimer--;
-    if(obs.length===0||cycloneTimer<=0)beginCycloneCountdown();
+    const enemiesReady=obs.length===0||cycloneTimer<=0;
+    const spinReady=cycloneSpinFrames>=GAME_CONFIG.cycloneSpinUpFrames;
+    if(enemiesReady&&spinReady)beginCycloneCountdown();
     return;
   }
+  p.rot+=GAME_CONFIG.cycloneSpinSpeed;
   cycloneTimer--;
   const step=GAME_CONFIG.cycloneCountdownStepFrames;
   const elapsed=step*4-cycloneTimer;
@@ -248,7 +246,7 @@ function updateCyclonePreparation(){
 function reset(){
  titleMode=false;
  paused=false;pauseConfirmAction=null;pauseRankingOpen=false;
- cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneCountdownLabel='';cycloneSpawned=0;cycloneLanePlan=[];nextCyclonePieceAt=cyclonePieceInterval();
+ cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneCountdownLabel='';cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;nextCyclonePieceAt=cyclonePieceInterval();
  document.querySelector('#pauseOverlay').classList.add('hidden');
  document.querySelector('#cycloneOverlay').classList.add('hidden');
  document.body.classList.remove('titleOnly');document.body.classList.add('gameOnly');
@@ -282,7 +280,7 @@ function reset(){
  rafId=requestAnimationFrame(now=>loop(token,now));
 }
 function jump(){
- if(titleMode||paused||cycloneState==='complete'||cycloneState==='escape'||cycloneState==='countdown')return;
+ if(titleMode||paused||cycloneState==='escape'||cycloneState==='countdown')return;
  if(!run){
    if(!gameOverRetryReady)return;
    gameOverRetryReady=false;initAudio();sfxStart();startBgm('game');reset();return;
@@ -555,7 +553,7 @@ function updateGameOverExplosion(){
   gameOverFragments=gameOverFragments.filter(f=>f.life>0&&f.y<H+80);
 }
 function update(){
- if(cycloneState==='complete'||cycloneState==='escape'||cycloneState==='countdown'){updateCyclonePreparation();return;}
+ if(cycloneState==='escape'||cycloneState==='countdown'){updateCyclonePreparation();return;}
  const cycloneActive=cycloneState==='active';
  if(!cycloneActive)dist+=speed/12;
  groundOffset=(groundOffset+speed)%10000;
@@ -616,7 +614,7 @@ function update(){
    }
  }
  if(!cycloneActive&&cycloneState==='idle'&&cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces&&lariatTimer<=0){
-   beginCycloneCompletion();
+   beginCyclonePreparation();
    return;
  }
  if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0)spawnPattern();
@@ -624,7 +622,8 @@ function update(){
  p.vy+=.67*timeScale;
  p.y+=p.vy*timeScale;
  if(p.y+p.h>=G){p.y=G-p.h;p.vy=0;if(!p.on)makeDust(p.x+8,G,5);p.on=true;p.jumps=0}else p.on=false;
- p.rot=p.on?0:p.rot+.11;
+ if(cycloneActive)p.rot+=GAME_CONFIG.cycloneSpinSpeed;
+ else p.rot=p.on?0:p.rot+.11;
 
  // Rescue shield pickup
  for(const it of items){
@@ -659,7 +658,7 @@ function update(){
    }
  }
  if(!cycloneActive&&cycloneState==='idle'&&cyclonePieces>=GAME_CONFIG.cycloneRequiredPieces&&lariatTimer<=0){
-   beginCycloneCompletion();
+   beginCyclonePreparation();
    return;
  }
 
@@ -884,7 +883,7 @@ function requestPauseConfirmation(action){
 }
 function returnToTitle(){
   paused=false;pauseConfirmAction=null;
-  cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];
+  cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;
   run=false;
   titleMode=true;
   gameToken++;
