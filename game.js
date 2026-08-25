@@ -312,6 +312,16 @@ function advance(){
  let b=document.querySelector('#banner');b.textContent=`STAGE ${stage}`;b.classList.add('show');bannerT=85;
  pendingSeasonBanner=(stage-1)%4===0?SEASON_NAMES[season()]:'';
 }
+function resolvePatternMember(o){
+ if(o.cyclone||o.pid<0||o.passed)return;
+ o.passed=true;
+ const unresolvedMember=obs.some(other=>other.pid===o.pid&&!other.passed);
+ if(!unresolvedMember&&!passedPatterns.has(o.pid)){
+   passedPatterns.add(o.pid);
+   cleared++;
+   if(cleared%10===0)advance();
+ }
+}
 
 /* Every pattern is hand-spaced to leave a valid route.
    New patterns unlock as stages increase. */
@@ -701,13 +711,7 @@ function update(){
     o.y=o.baseY+Math.sin(o.age/o.period*Math.PI*2)*o.amp;
   }
   if(!o.cyclone&&!o.passed && o.x+o.w<p.x){
-    o.passed=true;
-    const samePatternStillAhead = obs.some(other => other.pid===o.pid && !other.passed && other.x+other.w>=p.x);
-    if(!samePatternStillAhead && !passedPatterns.has(o.pid)){
-      passedPatterns.add(o.pid);
-      cleared++;
-      if(cleared%10===0)advance();
-    }
+    resolvePatternMember(o);
   }
   if(o.type==='gap'){
    if(p.x+p.w>o.x&&p.x<o.x+o.w&&p.y+p.h>=G-3){
@@ -722,6 +726,7 @@ function update(){
       if(lariatTimer>0){
         // Only on actual contact: launch this animal up-right.
         registerLariatDefeat(o);
+        resolvePatternMember(o);
         o.flying=true;sfxHit();
        o.flyVx=10+Math.random()*3;
        o.flyVy=-12-Math.random()*3;
