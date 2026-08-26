@@ -56,7 +56,7 @@ function drawTitleDemoLariatButton(ctx,t){
   const active=t>=3950,pulse=Math.abs(t-3950)<190,scale=pulse?1.08:1,x=526,y=14,w=178,h=66;
   ctx.save();ctx.translate(x+w/2,y+h/2);ctx.scale(scale,scale);ctx.translate(-w/2,-h/2);
   ctx.fillStyle='#7a2020';ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(w-10,0);ctx.quadraticCurveTo(w,0,w,10);ctx.lineTo(w,h-10);ctx.quadraticCurveTo(w,h,w-10,h);ctx.lineTo(10,h);ctx.quadraticCurveTo(0,h,0,h-10);ctx.lineTo(0,10);ctx.quadraticCurveTo(0,0,10,0);ctx.closePath();ctx.fill();ctx.stroke();
-  ctx.fillStyle='#fff';ctx.font='900 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ダブルラリアット',w/2,18);
+  ctx.fillStyle='#fff';ctx.font='900 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('坂田モッシュ',w/2,18);
   ctx.fillStyle='#3a1111';ctx.fillRect(13,32,w-26,7);ctx.fillStyle=active?'#f2c94c':'#eee';ctx.fillRect(13,32,w-26,7);
   ctx.fillStyle='#ddd';ctx.font='900 10px sans-serif';ctx.fillText(active?'発動中！':'READY',w/2,52);ctx.restore();
 }

@@ -79,7 +79,7 @@ function updateCycloneMeter(){
     for(let i=0;i<required;i++){
       const slot=document.createElement('span');
       slot.className='cycloneSlot';
-      const glyph=document.createElement('span');glyph.className='cycloneGlyph';glyph.textContent='🌪';
+      const glyph=document.createElement('span');glyph.className='cycloneGlyph';glyph.textContent='🤘';
       slot.appendChild(glyph);
       slots.appendChild(slot);
     }
@@ -91,7 +91,7 @@ function updateCycloneMeter(){
   meter.classList.toggle('hidden',!visible);
   meter.classList.toggle('complete',charged);
   meter.style.setProperty('--cyclone-pulse-duration',(pulseDurations[Math.min(filled,5)]||.28)+'s');
-  meter.setAttribute('aria-label',`サイクロン ${filled} / ${required}`);
+  meter.setAttribute('aria-label',`坂田メロディックスピードメタル ${filled} / ${required}`);
   const newlyFilledSlots=[];
   [...slots.children].forEach((slot,index)=>{
     const shouldFill=index<filled;
@@ -124,7 +124,7 @@ function syncLariatReadyUi(){
   const lb=document.querySelector('#lariatBtn');
   lb.disabled=false;
   document.querySelector('#lariatFill').style.transform='scaleX(1)';
-  document.querySelector('#lariatLabel').textContent='ダブルラリアット';
+  document.querySelector('#lariatLabel').textContent='坂田モッシュ';
   document.querySelector('#lariatStatus').textContent='READY';
 }
 function beginItemChance(){
@@ -170,7 +170,7 @@ function beginCyclonePreparation(){
   updateItemHud();
   const lb=document.querySelector('#lariatBtn');
   lb.disabled=true;
-  document.querySelector('#lariatLabel').textContent='サイクロンラリアット';
+  document.querySelector('#lariatLabel').textContent='坂田メロディックスピードメタル';
   document.querySelector('#lariatStatus').textContent='STANDBY';
   showCycloneOverlay('cutin');
   stopBgm();sfxThunder();
@@ -201,7 +201,7 @@ function startCycloneBonus(){
   scoreState.lariatCombo=0;scoreState.lariatBonus=0;
   const lb=document.querySelector('#lariatBtn');
   lb.disabled=true;lb.classList.add('activeNow');
-  document.querySelector('#lariatLabel').textContent='サイクロンラリアット';
+  document.querySelector('#lariatLabel').textContent='坂田メロディックスピードメタル';
   document.querySelector('#lariatStatus').textContent='BONUS TIME!';
   document.querySelector('#activeFill').style.transform='scaleX(1)';
   sfxLariat();startBgm('cyclone');
@@ -218,7 +218,7 @@ function finishCycloneScoring(){
   cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;
   nextCyclonePieceAt=dist+cyclonePieceInterval();
   spawnTimer=180;
-  document.querySelector('#lariatLabel').textContent='ダブルラリアット';
+  document.querySelector('#lariatLabel').textContent='坂田モッシュ';
   updateItemHud();
 }
 function updateCyclonePreparation(){
@@ -272,7 +272,7 @@ function reset(){
  lb.disabled=false;
  document.querySelector('#pauseBtn').classList.remove('hidden');
  
- document.querySelector('#lariatLabel').textContent='ダブルラリアット';
+ document.querySelector('#lariatLabel').textContent='坂田モッシュ';
  document.querySelector('#lariatStatus').textContent='READY';
  document.querySelector('#lariatFill').style.transform='scaleX(1)';
  document.querySelector('#activeFill').style.transform='scaleX(1)';
