@@ -68,13 +68,13 @@ function drawTitleDemoExplosion(ctx,d){
   else if(t>=8250&&t<8950)progress=1-(t-8250)/700;
   if(progress<=0)return false;
   const size=76,piece=size/4,cx=d.player.x+29,cy=d.player.y+31,eased=1-Math.pow(1-progress,2);
-  const sw=zangiefImg.naturalWidth/4,sh=zangiefImg.naturalHeight/4;
+  const sw=sakataImg.naturalWidth/4,sh=sakataImg.naturalHeight/4;
   for(let row=0;row<4;row++)for(let col=0;col<4;col++){
     const ox=(col-1.5)*piece,oy=(row-1.5)*piece,len=Math.hypot(ox,oy)||1,seed=(row*4+col)*1.73;
     const dx=ox/len*(46+((row+col)%3)*16)*eased+Math.sin(seed)*12*eased;
     const dy=oy/len*(42+((row*2+col)%4)*13)*eased-28*eased+42*eased*eased;
     ctx.save();ctx.translate(cx+ox+dx,cy+oy+dy);ctx.rotate((col-row)*.32*eased);ctx.globalAlpha=Math.max(.25,1-progress*.28);
-    if(zangiefImg.complete&&zangiefImg.naturalWidth)ctx.drawImage(zangiefImg,col*sw,row*sh,sw,sh,-piece/2,-piece/2,piece,piece);else{ctx.fillStyle='#8b2f2f';ctx.fillRect(-piece/2,-piece/2,piece,piece)}ctx.restore();
+    if(sakataImg.complete&&sakataImg.naturalWidth)ctx.drawImage(sakataImg,col*sw,row*sh,sw,sh,-piece/2,-piece/2,piece,piece);else{ctx.fillStyle='#252525';ctx.fillRect(-piece/2,-piece/2,piece,piece)}ctx.restore();
   }
   if(t<8250){for(let i=0;i<16;i++){const a=i*Math.PI/8+.2,r=(28+(i%4)*13)*eased;ctx.fillStyle=i%2?'#ffb21c':'#fff3a6';ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,2+(i%3),0,Math.PI*2);ctx.fill()}}
   return true;
@@ -98,7 +98,7 @@ function drawTitleDemo(){
   const exploded=drawTitleDemoExplosion(ctx,d);
   if(!exploded){ctx.save();ctx.translate(d.player.x+29,d.player.y+31);const demoLariatFrames=(d.elapsed-3950)/16.667;ctx.rotate(lariat?demoLariatFrames*.55:d.player.rot);
   if(lariat){ctx.strokeStyle='#f4d35e';ctx.lineWidth=7;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(0,0,48,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
-  if(zangiefImg.complete&&zangiefImg.naturalWidth)ctx.drawImage(zangiefImg,-38,-42,76,76);else{ctx.fillStyle='#8b2f2f';ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill()}
+  if(sakataImg.complete&&sakataImg.naturalWidth)ctx.drawImage(sakataImg,-38,-42,76,76);else{ctx.fillStyle='#252525';ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fill()}
   ctx.restore()}
   if(d.player.on&&!exploded){ctx.fillStyle='rgba(230,220,190,.55)';for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(d.player.x-5-i*9,TITLE_DEMO_GROUND-3-i*2,3+i,0,Math.PI*2);ctx.fill()}}
   drawTitleDemoLariatButton(ctx,d.elapsed);

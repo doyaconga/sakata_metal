@@ -1,5 +1,5 @@
 const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
-const zangiefImg=new Image();zangiefImg.src='assets/zangief.png';
+const sakataImg=new Image();sakataImg.src='assets/sakata.png';
 function renderDebugSettings(){
   const fields=document.querySelector('#debugFields');fields.innerHTML='';
   for(const def of DEBUG_SETTING_DEFS){

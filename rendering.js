@@ -545,9 +545,9 @@ function draw(){
    const blinkFrames=lariatTimer<=GAME_CONFIG.lariatCriticalFrames?3:8;
    if(Math.floor(lariatTimer/blinkFrames)%2===0)x.globalAlpha=.22;
  }
- if(zangiefImg.complete){
+ if(sakataImg.complete){
    const size=76;
-   x.drawImage(zangiefImg,-size/2,-size/2-4,size,size);
+   x.drawImage(sakataImg,-size/2,-size/2-4,size,size);
  }else{
    x.fillStyle='#8b2f2f';x.beginPath();x.arc(0,0,28,0,Math.PI*2);x.fill();
  }
@@ -555,7 +555,7 @@ function draw(){
   }
   x.globalAlpha=1;
   if(gameOverFragments.length){
-    const sw=zangiefImg.naturalWidth/4,sh=zangiefImg.naturalHeight/4;
+    const sw=sakataImg.naturalWidth/4,sh=sakataImg.naturalHeight/4;
     for(const f of gameOverFragments){
       x.save();x.translate(f.x,f.y);
       x.globalAlpha=Math.max(0,Math.min(1,f.life/18));
@@ -564,8 +564,8 @@ function draw(){
         x.beginPath();x.arc(0,0,f.size,0,Math.PI*2);x.fill();
       }else{
         x.rotate(f.rot);
-        if(zangiefImg.complete&&zangiefImg.naturalWidth){
-          x.drawImage(zangiefImg,f.col*sw,f.row*sh,sw,sh,-f.size/2,-f.size/2,f.size,f.size);
+        if(sakataImg.complete&&sakataImg.naturalWidth){
+          x.drawImage(sakataImg,f.col*sw,f.row*sh,sw,sh,-f.size/2,-f.size/2,f.size,f.size);
         }else{
           x.fillStyle='#8b2f2f';x.fillRect(-f.size/2,-f.size/2,f.size,f.size);
         }
