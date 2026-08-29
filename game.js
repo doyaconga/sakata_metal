@@ -38,13 +38,13 @@ function commitDebugInputs(showStatus=true){
 }
 let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],bannerT=0,bannerGapT=0,pendingSeasonBanner='',patternSeq=0,passedPatterns=new Set(),animalSpawnCounts={},rafId=null,gameToken=0,groundOffset=0,lariatTimer=0,lariatCooldown=0,lariatEndInvuln=0;
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
-let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,cycloneResultMusicDelay=0,nextCyclonePieceAt=350;
+let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,cycloneResultMusicDelay=0,cycloneScoreRevealTimer=0,cycloneScoreRevealPoints=0,nextCyclonePieceAt=350;
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
 let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
-let displayedTotalScore=0,scoreGainNotices=[],nextScoreGainNoticeId=1;
+let displayedTotalScore=0,scoreGainNotices=[],nextScoreGainNoticeId=1,fastScoreCountup=false;
 const p={x:150,y:G-62,w:58,h:62,vy:0,jumps:0,on:true,rot:0};
 
 // Run game simulation at the original 60 updates per second regardless of
@@ -191,6 +191,7 @@ function spawnCycloneTarget(){
 }
 function startCycloneBonus(){
   cycloneState='active';cycloneSpawned=0;
+  fastScoreCountup=true;
   const targetCount=GAME_CONFIG.cycloneTargetCount;
   const groundCount=Math.round(targetCount*.4),midCount=Math.round(targetCount/3);
   cycloneLanePlan=[...Array(groundCount).fill('ground'),...Array(midCount).fill('mid'),...Array(Math.max(0,targetCount-groundCount-midCount)).fill('high')];
@@ -210,7 +211,9 @@ function startCycloneBonus(){
 function finishCycloneScoring(){
   const combo=scoreState.lariatCombo,bonus=scoreState.lariatBonus;
   scoreEffects=scoreEffects.filter(effect=>effect.type!=='combo');
-  scoreEffects.push({type:'cycloneResult',combo,bonus,life:150,maxLife:150});
+  scoreEffects.push({type:'cycloneResult',combo,bonus,life:GAME_CONFIG.cycloneResultDisplayFrames,maxLife:GAME_CONFIG.cycloneResultDisplayFrames});
+  cycloneScoreRevealTimer=GAME_CONFIG.cycloneResultDisplayFrames;
+  cycloneScoreRevealPoints=bonus;
   stopBgm();
   sfxCycloneResult();
   cycloneResultMusicDelay=GAME_CONFIG.cycloneResultFanfareFrames;
@@ -250,7 +253,7 @@ function updateCyclonePreparation(){
 function reset(){
  titleMode=false;
  paused=false;pauseConfirmAction=null;pauseRankingOpen=false;
- cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneCountdownLabel='';cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;cycloneResultMusicDelay=0;nextCyclonePieceAt=cyclonePieceInterval();
+ cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneCountdownLabel='';cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;cycloneResultMusicDelay=0;cycloneScoreRevealTimer=0;cycloneScoreRevealPoints=0;nextCyclonePieceAt=cyclonePieceInterval();
  document.querySelector('#pauseOverlay').classList.add('hidden');
  document.querySelector('#cycloneOverlay').classList.add('hidden');
  document.body.classList.remove('titleOnly');document.body.classList.add('gameOnly');
@@ -263,7 +266,7 @@ function reset(){
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
  scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
- displayedTotalScore=0;scoreGainNotices=[];nextScoreGainNoticeId=1;
+ displayedTotalScore=0;scoreGainNotices=[];nextScoreGainNoticeId=1;fastScoreCountup=false;
  Object.assign(p,{y:G-p.h,vy:0,jumps:0,on:true,rot:0});
  document.querySelector('#msg').classList.add('hidden');
  document.querySelector('#banner').classList.remove('show');
@@ -316,7 +319,7 @@ function registerLariatDefeat(o){
   const cycloneActive=cycloneState==='active';
   const index=scoreState.lariatCombo-1;
   const points=cycloneActive
-    ? (index<GAME_CONFIG.comboScores.length?GAME_CONFIG.comboScores[index]:GAME_CONFIG.comboScoreCap)
+    ? GAME_CONFIG.cycloneDefeatBaseScore+Math.min(index*GAME_CONFIG.cycloneComboStepScore,GAME_CONFIG.cycloneComboBonusCap)
     : GAME_CONFIG.lariatDefeatScore;
   scoreState.lariatBonus+=points;
   scoreState.bonus+=points;
@@ -325,7 +328,7 @@ function registerLariatDefeat(o){
   if(!cycloneActive)scoreGainNotices.push({id:nextScoreGainNoticeId++,points,life:55});
   if(cycloneActive){
     scoreEffects=scoreEffects.filter(e=>e.type!=='combo');
-    scoreEffects.push({type:'combo',combo:scoreState.lariatCombo,points,life:68,maxLife:68});
+    scoreEffects.push({type:'combo',combo:scoreState.lariatCombo,life:68,maxLife:68});
   }
 }
 function finishLariatScoring(){
@@ -334,7 +337,18 @@ function finishLariatScoring(){
 function updateScoreEffects(){
   for(const effect of scoreEffects)effect.life--;
   scoreEffects=scoreEffects.filter(effect=>effect.life>0);
-  if(displayedTotalScore<getTotalScore())displayedTotalScore++;
+  if(cycloneScoreRevealTimer>0){
+    cycloneScoreRevealTimer--;
+    if(cycloneScoreRevealTimer===0&&cycloneScoreRevealPoints>0){
+      scoreGainNotices.push({id:nextScoreGainNoticeId++,points:cycloneScoreRevealPoints,life:55});
+      cycloneScoreRevealPoints=0;
+    }
+  }
+  const holdCycloneScore=cycloneState==='active'||cycloneScoreRevealTimer>0;
+  if(!holdCycloneScore){
+    if(displayedTotalScore<getTotalScore())displayedTotalScore+=Math.min(fastScoreCountup?10:1,getTotalScore()-displayedTotalScore);
+    else if(cycloneState!=='active')fastScoreCountup=false;
+  }
   scoreGainNotices.forEach(notice=>notice.life--);
   scoreGainNotices=scoreGainNotices.filter(notice=>notice.life>0);
 }
@@ -905,7 +919,7 @@ function requestPauseConfirmation(action){
 }
 function returnToTitle(){
   paused=false;pauseConfirmAction=null;
-  cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;cycloneResultMusicDelay=0;
+  cyclonePieces=0;cycloneState='idle';cycloneTimer=0;cycloneSpawned=0;cycloneLanePlan=[];cycloneSpinFrames=0;cycloneResultMusicDelay=0;cycloneScoreRevealTimer=0;cycloneScoreRevealPoints=0;
   run=false;
   titleMode=true;
   gameToken++;

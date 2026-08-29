@@ -2,7 +2,7 @@ const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
-const DEBUG_SETTINGS_VERSION=3;
+const DEBUG_SETTINGS_VERSION=4;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','犬'],['cat','猫'],['birds','鳥'],['bats','コウモリ'],['snake','蛇'],['rabbit','ウサギ'],['cow','牛']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
 const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5};
@@ -28,6 +28,7 @@ const GAME_CONFIG={
   cycloneSpinStartSpeed:.035,
   cycloneSpinSpeed:.55,
   cycloneResultFanfareFrames:66,
+  cycloneResultDisplayFrames:150,
   cycloneEscapeMaxFrames:120,
   cycloneCountdownStepFrames:42,
   chargeRecoveryRatio:.20,
@@ -43,8 +44,9 @@ const GAME_CONFIG={
   itemChanceExitMeters:30,
   passScores:{pig:50,turtle:50,frog:60,cat:60,birds:70,snake:80,cow:90,bats:90,rabbit:100,dog:100},
   passSpeedMultiplierCap:2,
-  comboScores:[100,150,200,250],
-  comboScoreCap:300
+  cycloneDefeatBaseScore:100,
+  cycloneComboStepScore:5,
+  cycloneComboBonusCap:20
 };
 const DEBUG_SETTING_DEFS=[
   {key:'startStage',label:'開始ステージ',min:1,max:50,step:1,get:()=>GAME_CONFIG.startStage,set:v=>GAME_CONFIG.startStage=Math.round(v)},
@@ -70,11 +72,9 @@ const DEBUG_SETTING_DEFS=[
   {key:'snakeCycleMaxSec',label:'蛇の上下周期 最長（秒）',min:.3,max:5,step:.1,get:()=>GAME_CONFIG.snakeCycleMaxFrames/60,set:v=>GAME_CONFIG.snakeCycleMaxFrames=Math.round(v*60)},
   {key:'catSpeedMultiplier',label:'猫の速度倍率',min:1,max:3,step:.05,get:()=>GAME_CONFIG.catSpeedMultiplier,set:v=>GAME_CONFIG.catSpeedMultiplier=v},
   {key:'catAfterBatsSafeSec',label:'コウモリ後の猫 安全間隔（秒）',min:.2,max:3,step:.1,get:()=>GAME_CONFIG.catAfterBatsSafeFrames/60,set:v=>GAME_CONFIG.catAfterBatsSafeFrames=Math.round(v*60)},
-  {key:'combo1',label:'コンボ1体目（点）',min:0,max:5000,step:10,get:()=>GAME_CONFIG.comboScores[0],set:v=>GAME_CONFIG.comboScores[0]=Math.round(v)},
-  {key:'combo2',label:'コンボ2体目（点）',min:0,max:5000,step:10,get:()=>GAME_CONFIG.comboScores[1],set:v=>GAME_CONFIG.comboScores[1]=Math.round(v)},
-  {key:'combo3',label:'コンボ3体目（点）',min:0,max:5000,step:10,get:()=>GAME_CONFIG.comboScores[2],set:v=>GAME_CONFIG.comboScores[2]=Math.round(v)},
-  {key:'combo4',label:'コンボ4体目（点）',min:0,max:5000,step:10,get:()=>GAME_CONFIG.comboScores[3],set:v=>GAME_CONFIG.comboScores[3]=Math.round(v)},
-  {key:'comboCap',label:'コンボ5体目以降（点）',min:0,max:5000,step:10,get:()=>GAME_CONFIG.comboScoreCap,set:v=>GAME_CONFIG.comboScoreCap=Math.round(v)},
+  {key:'cycloneDefeatBaseScore',label:'メタル撃破 基礎点',min:0,max:5000,step:10,get:()=>GAME_CONFIG.cycloneDefeatBaseScore,set:v=>GAME_CONFIG.cycloneDefeatBaseScore=Math.round(v)},
+  {key:'cycloneComboStepScore',label:'メタル1コンボ毎の加算点',min:0,max:1000,step:5,get:()=>GAME_CONFIG.cycloneComboStepScore,set:v=>GAME_CONFIG.cycloneComboStepScore=Math.round(v)},
+  {key:'cycloneComboBonusCap',label:'メタルのコンボ加算上限',min:0,max:5000,step:5,get:()=>GAME_CONFIG.cycloneComboBonusCap,set:v=>GAME_CONFIG.cycloneComboBonusCap=Math.round(v)},
   {key:'itemEarlyMin',label:'ITEM 0～1500m 最短（m）',min:100,max:3000,step:50,get:()=>GAME_CONFIG.itemChanceRanges[0][2],set:v=>GAME_CONFIG.itemChanceRanges[0][2]=Math.round(v)},
   {key:'itemEarlyMax',label:'ITEM 0～1500m 最長（m）',min:100,max:3000,step:50,get:()=>GAME_CONFIG.itemChanceRanges[0][3],set:v=>GAME_CONFIG.itemChanceRanges[0][3]=Math.round(v)},
   {key:'itemMidMin',label:'ITEM 1500～3000m 最短（m）',min:100,max:3000,step:50,get:()=>GAME_CONFIG.itemChanceRanges[1][2],set:v=>GAME_CONFIG.itemChanceRanges[1][2]=Math.round(v)},

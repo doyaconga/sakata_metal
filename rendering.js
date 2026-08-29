@@ -9,9 +9,7 @@ function drawScoreEffects(){
       x.translate(W/2,225);x.scale(pop,pop);
       x.lineWidth=8;x.strokeStyle='rgba(40,12,5,.75)';
       x.fillStyle='#ffe45c';x.font='950 66px sans-serif';
-      x.strokeText(`${effect.combo} COMBO!`,0,-22);x.fillText(`${effect.combo} COMBO!`,0,-22);
-      x.fillStyle='#fff';x.font='950 38px sans-serif';
-      x.strokeText(`+${fmt(effect.points)}`,0,40);x.fillText(`+${fmt(effect.points)}`,0,40);
+      x.strokeText(`${effect.combo} COMBO!`,0,0);x.fillText(`${effect.combo} COMBO!`,0,0);
     }else if(effect.type==='cycloneResult'){
       const rise=Math.min(18,age*.28);
       x.translate(W/2,255-rise);
