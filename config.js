@@ -3,7 +3,7 @@ const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
 const DEBUG_SETTINGS_VERSION=4;
-const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','犬'],['cat','猫'],['birds','鳥'],['bats','コウモリ'],['snake','蛇'],['rabbit','ウサギ'],['cow','牛']];
+const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
 const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5};
 let debugEnabledAnimals=new Set(ANIMAL_TYPES);

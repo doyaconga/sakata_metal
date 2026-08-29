@@ -144,6 +144,58 @@ function saveScoreRecord(record){
     // browser storage is unavailable or full.
   }
 }
+const PLAY_STATS_STORAGE_KEY='sakataPlayStatsV1';
+function emptyPlayStats(){
+  return {distanceBest:0,distanceTotal:0,passedBest:0,passedTotal:0,defeatedBest:0,defeatedTotal:0,deaths:{}};
+}
+function getPlayStats(){
+  const empty=emptyPlayStats();
+  try{
+    const saved=JSON.parse(localStorage.getItem(PLAY_STATS_STORAGE_KEY)||'null');
+    if(!saved||typeof saved!=='object')return empty;
+    for(const key of ['distanceBest','distanceTotal','passedBest','passedTotal','defeatedBest','defeatedTotal']){
+      const value=Number(saved[key]);empty[key]=Number.isFinite(value)&&value>0?Math.floor(value):0;
+    }
+    if(saved.deaths&&typeof saved.deaths==='object'){
+      for(const type of ANIMAL_TYPES){
+        const value=Number(saved.deaths[type]);
+        if(Number.isFinite(value)&&value>0)empty.deaths[type]=Math.floor(value);
+      }
+    }
+  }catch(e){}
+  return empty;
+}
+function savePlayStats(record){
+  if(!record)return;
+  try{
+    const stats=getPlayStats();
+    const distance=Math.max(0,Math.floor(Number(record.distance)||0));
+    const passed=Math.max(0,Math.floor(Number(record.passed)||0));
+    const defeated=Math.max(0,Math.floor(Number(record.defeated)||0));
+    stats.distanceBest=Math.max(stats.distanceBest,distance);stats.distanceTotal+=distance;
+    stats.passedBest=Math.max(stats.passedBest,passed);stats.passedTotal+=passed;
+    stats.defeatedBest=Math.max(stats.defeatedBest,defeated);stats.defeatedTotal+=defeated;
+    if(ANIMAL_TYPES.includes(record.deathCause))stats.deaths[record.deathCause]=(stats.deaths[record.deathCause]||0)+1;
+    localStorage.setItem(PLAY_STATS_STORAGE_KEY,JSON.stringify(stats));
+  }catch(e){}
+}
+function showPlayRecords(){
+  const stats=getPlayStats();
+  const table=document.querySelector('#recordStats');table.replaceChildren();
+  const rows=[
+    ['移動した距離',`${fmt(stats.distanceBest)}m`,`${fmt(stats.distanceTotal)}m`],
+    ['突破した動物',fmt(stats.passedBest),fmt(stats.passedTotal)],
+    ['倒した動物',fmt(stats.defeatedBest),fmt(stats.defeatedTotal)]
+  ];
+  for(const text of ['項目','最高','累計']){const cell=document.createElement('span');cell.className='recordHeader';cell.textContent=text;table.appendChild(cell)}
+  for(const row of rows)for(const text of row){const cell=document.createElement('span');cell.textContent=text;table.appendChild(cell)}
+  const deathList=document.querySelector('#deathList');deathList.replaceChildren();
+  const names=Object.fromEntries(ANIMAL_OPTIONS);
+  const deaths=ANIMAL_TYPES.map((type,index)=>({type,index,count:stats.deaths[type]||0})).filter(item=>item.count>0).sort((a,b)=>b.count-a.count||a.index-b.index).slice(0,3);
+  if(deaths.length===0){const row=document.createElement('div');row.className='deathRow empty';row.textContent='まだ記録なし';deathList.appendChild(row)}
+  else deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
+  document.querySelector('#recordModal').classList.remove('hidden');
+}
 function showScores(){
   const list=document.querySelector('#scoreList');
   const scores=getScores();

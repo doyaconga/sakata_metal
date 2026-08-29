@@ -526,7 +526,7 @@ function spawnPattern(){
  spawnTimer=(base-(W+50))+max+220+Math.random()*90;
 }
 
-function die(){
+function die(deathCause){
  if(lariatTimer>0 || rescueInvuln>0)return;
  if(meatShield>0){
    meatShield--;
@@ -544,6 +544,7 @@ function die(){
   const score=Math.floor(dist);
   const totalScore=getTotalScore();
   saveScoreRecord({totalScore});
+  savePlayStats({distance:score,passed:scoreState.passed,defeated:scoreState.defeated,deathCause});
   document.querySelector('#gameOverContent').innerHTML=`
     <b class="gameOverTitle">GAME OVER</b>
     <div class="gameOverTotalLabel">TOTAL SCORE</div>
@@ -834,7 +835,7 @@ function update(){
       for(let i=0;i<12;i++)makeDust(o.x+o.w/2,oy+o.h/2,1);
       continue;
     }
-    die();break;
+    die(o.type);break;
   }
  }
  obs=obs.filter(o=>o.x+o.w>-80 && (!o.flying || (o.y??0)<H+120));
@@ -883,6 +884,7 @@ startTitleDemo();
 function closePauseRanking(){
   pauseRankingOpen=false;
   document.querySelector('#scoreModal').classList.add('hidden');
+  document.querySelector('#recordModal').classList.add('hidden');
   document.body.classList.remove('scoreModalOpen');
 }
 function showPauseMenu(){
@@ -992,6 +994,19 @@ document.querySelector('#scoreBtn').addEventListener('pointerdown',e=>{
   initAudio();
   sfxButton();
   showScores();
+});
+document.querySelector('#recordBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  initAudio();
+  sfxButton();
+  showPlayRecords();
+});
+document.querySelector('#recordClose').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  sfxButton();
+  document.querySelector('#recordModal').classList.add('hidden');
 });
 document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
   e.preventDefault();
