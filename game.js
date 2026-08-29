@@ -131,8 +131,10 @@ function syncLariatReadyUi(){
 function beginItemChance(){
   itemChancePending=false;itemChanceActive=true;itemChanceChosen=false;itemChanceChosenAt=0;
   const group='choice-'+Math.floor(dist);
-  items.push({type:'shield',group,x:W+80,y:G-185,w:46,h:46,taken:false,bob:0});
-  items.push({type:'speedDown',group,x:W+80,y:G-70,w:46,h:46,taken:false,bob:Math.PI});
+  const choices=['shield','speedDown','speedUp'];
+  for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]]}
+  items.push({type:choices[0],group,x:W+80,y:G-185,w:46,h:46,taken:false,bob:0});
+  items.push({type:choices[1],group,x:W+80,y:G-70,w:46,h:46,taken:false,bob:Math.PI});
   const b=document.querySelector('#banner');b.textContent='ITEM CHANCE';b.classList.add('show');bannerT=105;
 }
 function finishItemChance(){
@@ -671,7 +673,7 @@ function update(){
  for(const it of items){
    const itemHit={x:it.x+3,y:it.y+3,w:it.w-6,h:it.h-6};
    const playerHit={x:p.x+11,y:p.y+9,w:p.w-20,h:p.h-15};
-   const choiceItem=it.type==='shield'||it.type==='speedDown';
+   const choiceItem=it.type==='shield'||it.type==='speedDown'||it.type==='speedUp';
    if((!choiceItem||!itemChanceChosen) && !it.taken && rect(playerHit,itemHit)){
      it.taken=true;
      if(choiceItem){itemChanceChosen=true;itemChanceChosenAt=dist}
@@ -690,6 +692,10 @@ function update(){
      else if(it.type==='speedDown'){
        speed=Math.max(GAME_CONFIG.minSpeed,speed-GAME_CONFIG.speedStep*GAME_CONFIG.speedDownSteps);
        scoreEffects.push({type:'itemNotice',text:'🐢 SPEED DOWN',color:'#b9ff9f',life:90,maxLife:90});
+     }
+     else if(it.type==='speedUp'){
+       speed=Math.min(GAME_CONFIG.maxSpeed,speed+GAME_CONFIG.speedStep*GAME_CONFIG.speedUpSteps);
+       scoreEffects.push({type:'itemNotice',text:'🐈 SPEED UP',color:'#ffd17c',life:90,maxLife:90});
      }
      updateItemHud();
      sfxButton();

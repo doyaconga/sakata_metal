@@ -2,7 +2,7 @@ const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
-const DEBUG_SETTINGS_VERSION=4;
+const DEBUG_SETTINGS_VERSION=5;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
 const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5};
@@ -12,7 +12,7 @@ const GAME_CONFIG={
   minSpeed:6,
   initialSpeed:6,
   speedStep:.39,
-  maxSpeed:10,
+  maxSpeed:15,
   lariatDurationFrames:90,  // 発動時間：約1.5秒（60フレーム＝1秒）
   lariatCooldownFrames:1200, // 発動開始から再使用可能になるまで：約20秒。発動中も減少する
   lariatWarningFrames:30,
@@ -35,6 +35,7 @@ const GAME_CONFIG={
   chargeIntervalMin:250,
   chargeIntervalMax:450,
   speedDownSteps:2,
+  speedUpSteps:2,
   snakeCycleMinFrames:65,
   snakeCycleMaxFrames:135,
   catSpeedMultiplier:1.65,
@@ -68,6 +69,7 @@ const DEBUG_SETTING_DEFS=[
   {key:'chargeIntervalMin',label:'道中CHARGE 最短間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.chargeIntervalMin,set:v=>GAME_CONFIG.chargeIntervalMin=Math.round(v)},
   {key:'chargeIntervalMax',label:'道中CHARGE 最長間隔（m）',min:50,max:3000,step:50,get:()=>GAME_CONFIG.chargeIntervalMax,set:v=>GAME_CONFIG.chargeIntervalMax=Math.round(v)},
   {key:'speedDownSteps',label:'SPEED DOWN低下段階',min:1,max:10,step:1,get:()=>GAME_CONFIG.speedDownSteps,set:v=>GAME_CONFIG.speedDownSteps=Math.round(v)},
+  {key:'speedUpSteps',label:'SPEED UP上昇段階',min:1,max:10,step:1,get:()=>GAME_CONFIG.speedUpSteps,set:v=>GAME_CONFIG.speedUpSteps=Math.round(v)},
   {key:'snakeCycleMinSec',label:'蛇の上下周期 最短（秒）',min:.3,max:5,step:.1,get:()=>GAME_CONFIG.snakeCycleMinFrames/60,set:v=>GAME_CONFIG.snakeCycleMinFrames=Math.round(v*60)},
   {key:'snakeCycleMaxSec',label:'蛇の上下周期 最長（秒）',min:.3,max:5,step:.1,get:()=>GAME_CONFIG.snakeCycleMaxFrames/60,set:v=>GAME_CONFIG.snakeCycleMaxFrames=Math.round(v*60)},
   {key:'catSpeedMultiplier',label:'猫の速度倍率',min:1,max:3,step:.05,get:()=>GAME_CONFIG.catSpeedMultiplier,set:v=>GAME_CONFIG.catSpeedMultiplier=v},
@@ -122,6 +124,7 @@ function loadDebugSettings(){
       if(Number(saved.lariatWarningSec)===1)saved.lariatWarningSec=.5;
       if(Number(saved.lariatCriticalSec)===.4)saved.lariatCriticalSec=.2;
     }
+    if(savedVersion<5&&Number(saved.maxSpeed)===10)saved.maxSpeed=15;
     saved._version=DEBUG_SETTINGS_VERSION;
     applyDebugValues(saved);
     localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()));

@@ -216,7 +216,7 @@ function draw(){
    x.save();
    x.translate(it.x,it.y+Math.sin(it.bob)*4);
    x.font='900 12px sans-serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.75)';x.fillStyle='#fff';
-   const label=it.type==='shield'?'🛡 GUARD':(it.type==='speedDown'?'🐢 SPEED DOWN':(it.type==='cyclonePiece'?'🤘 METAL':`⚡ CHARGE +${Math.round(GAME_CONFIG.chargeRecoveryRatio*100)}%`));x.strokeText(label,23,-8);x.fillText(label,23,-8);
+   const label=it.type==='shield'?'🛡 GUARD':(it.type==='speedDown'?'🐢 SPEED DOWN':(it.type==='speedUp'?'🐈 SPEED UP':(it.type==='cyclonePiece'?'🤘 METAL':`⚡ CHARGE +${Math.round(GAME_CONFIG.chargeRecoveryRatio*100)}%`)));x.strokeText(label,23,-8);x.fillText(label,23,-8);
    if(it.type==='shield'){
      x.translate(2,0);x.fillStyle='#d8dde6';x.strokeStyle='#38485c';x.lineWidth=3;
      x.beginPath();x.moveTo(21,3);x.lineTo(39,10);x.lineTo(37,27);x.quadraticCurveTo(33,39,21,45);x.quadraticCurveTo(9,39,5,27);x.lineTo(3,10);x.closePath();x.fill();x.stroke();
@@ -224,6 +224,8 @@ function draw(){
      x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=3;x.beginPath();x.moveTo(21,9);x.lineTo(21,36);x.stroke();
    }else if(it.type==='speedDown'){
      x.shadowColor='#8dff72';x.shadowBlur=12;x.font='34px sans-serif';x.textAlign='center';x.fillStyle='#fff';x.fillText('🐢',23,36);x.shadowBlur=0;
+   }else if(it.type==='speedUp'){
+     x.shadowColor='#ffb347';x.shadowBlur=12;x.font='34px sans-serif';x.textAlign='center';x.fillStyle='#fff';x.fillText('🐈',23,36);x.shadowBlur=0;
    }else if(it.type==='cyclonePiece'){
      x.shadowColor='#77edff';x.shadowBlur=16;x.strokeStyle='#1c6674';x.fillStyle='#9af4ff';x.lineWidth=3;
      x.beginPath();x.arc(23,23,18,0,Math.PI*2);x.fill();x.stroke();
