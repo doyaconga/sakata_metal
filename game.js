@@ -42,7 +42,7 @@ let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
-let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
+let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
 let displayedTotalScore=0,scoreGainNotices=[],nextScoreGainNoticeId=1,fastScoreCountup=false;
 const p={x:150,y:G-62,w:58,h:62,vy:0,jumps:0,on:true,rot:0};
@@ -265,7 +265,7 @@ function reset(){
  items=[];meatShield=0;rescueInvuln=0;itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
- scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
+ scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
  displayedTotalScore=0;scoreGainNotices=[];nextScoreGainNoticeId=1;fastScoreCountup=false;
  Object.assign(p,{y:G-p.h,vy:0,jumps:0,on:true,rot:0});
  document.querySelector('#msg').classList.add('hidden');
@@ -324,7 +324,6 @@ function registerLariatDefeat(o){
   scoreState.lariatBonus+=points;
   scoreState.bonus+=points;
   scoreState.defeated++;
-  scoreState.bestCombo=Math.max(scoreState.bestCombo,scoreState.lariatCombo);
   if(!cycloneActive)scoreGainNotices.push({id:nextScoreGainNoticeId++,points,life:55});
   if(cycloneActive){
     scoreEffects=scoreEffects.filter(e=>e.type!=='combo');
@@ -549,7 +548,11 @@ function die(){
     <b class="gameOverTitle">GAME OVER</b>
     <div class="gameOverTotalLabel">TOTAL SCORE</div>
     <div class="gameOverTotal">${fmt(totalScore)}</div>
-    <div class="gameOverStats">DISTANCE　${fmt(score)}m<br>BEST COMBO　${scoreState.bestCombo}</div>`;
+    <div class="gameOverStats">
+      <span class="gameOverStatLabel">移動した距離</span><span class="gameOverStatValue">${fmt(score)}m</span>
+      <span class="gameOverStatLabel">突破した動物の数</span><span class="gameOverStatValue">${fmt(scoreState.passed)}</span>
+      <span class="gameOverStatLabel">倒した動物の数</span><span class="gameOverStatValue">${fmt(scoreState.defeated)}</span>
+    </div>`;
   startGameOverExplosion();
   gameOverMessageTimeout=setTimeout(()=>{
     document.querySelector('#msg').classList.remove('hidden');

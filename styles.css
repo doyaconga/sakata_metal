@@ -148,7 +148,9 @@ body.titleOnly #scoreModal:not(.hidden){
 #gameOverContent .gameOverTitle{display:block;font-size:30px;margin-bottom:10px}
 #gameOverContent .gameOverTotalLabel{font-size:17px;font-weight:900;color:#ffe45c}
 #gameOverContent .gameOverTotal{font-size:46px;line-height:1.08;font-weight:1000;color:#fff;margin:2px 0 13px}
-#gameOverContent .gameOverStats{font-size:19px;line-height:1.55;font-weight:900}
+#gameOverContent .gameOverStats{display:grid;grid-template-columns:1fr 1fr;width:100%;column-gap:14px;row-gap:10px;font-size:16px;line-height:1.35;font-weight:900}
+#gameOverContent .gameOverStatLabel{text-align:right}
+#gameOverContent .gameOverStatValue{text-align:left;font-variant-numeric:tabular-nums}
 
 #pauseOverlay{position:absolute;inset:0;z-index:300;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.72);pointer-events:auto;color:#fff;text-align:center;text-shadow:2px 2px #000}
 #pausePanel{width:min(520px,calc(100% - 36px));min-height:410px;padding:32px 34px;border-radius:16px;background:#000a;display:flex;flex-direction:column;justify-content:center}
