@@ -248,7 +248,6 @@ function draw(){
  }
 
  for(const o of obs){
-  if(o.type==='gap'){x.fillStyle='#10151c';x.fillRect(o.x,G,o.w,H-G);continue}
   let oy=o.y??G-o.h;
   x.save();
   x.translate(o.x,oy);
@@ -589,7 +588,6 @@ function draw(){
       x.restore();
     };
     for(const o of obs){
-      if(o.type==='gap')continue;
       obstacleHitboxes(o).forEach((box,i)=>drawHitbox(box,'#ff4d4d',i===0?o.type.toUpperCase():''));
     }
     if(!playerExploded&&lariatEndInvuln<=0)drawHitbox(playerHitbox(),'#38e8ff','PLAYER');

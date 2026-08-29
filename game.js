@@ -793,36 +793,28 @@ function update(){
   }else if(o.move==='bob'){
     o.y=o.baseY+Math.sin(o.age/o.period*Math.PI*2)*o.amp;
   }
-  const safelyPassed=o.type==='gap'
-    ? o.x+o.w<p.x
-    : obstacleHitboxes(o).every(hit=>hit.x+hit.w<=playerHitbox().x);
+  const safelyPassed=obstacleHitboxes(o).every(hit=>hit.x+hit.w<=playerHitbox().x);
   if(!o.cyclone&&!o.passed&&safelyPassed){
     registerAnimalPass(o);
     resolvePatternMember(o);
   }
-  if(o.type==='gap'){
-   if(p.x+p.w>o.x&&p.x<o.x+o.w&&p.y+p.h>=G-3){
-     if(lariatTimer<=0){die();break}
-   }
-  }else{
-    let oy=o.y??G-o.h;
-    if(lariatEndInvuln>0)continue;
-    const hits=obstacleHitboxes(o);
-    const playerHit=playerHitbox();
-    if(hits.some(hit=>rect(playerHit,hit))){
-      if(lariatTimer>0){
-        // Only on actual contact: launch this animal up-right.
-        registerLariatDefeat(o);
-        resolvePatternMember(o);
-        o.flying=true;sfxHit();
-       o.flyVx=10+Math.random()*3;
-       o.flyVy=-12-Math.random()*3;
-       o.flyRot=(Math.random()>.5?1:-1)*(0.3+Math.random()*0.2);
-       for(let i=0;i<12;i++)makeDust(o.x+o.w/2,oy+o.h/2,1);
-       continue;
-     }
-     die();break;
-   }
+  let oy=o.y??G-o.h;
+  if(lariatEndInvuln>0)continue;
+  const hits=obstacleHitboxes(o);
+  const playerHit=playerHitbox();
+  if(hits.some(hit=>rect(playerHit,hit))){
+    if(lariatTimer>0){
+      // Only on actual contact: launch this animal up-right.
+      registerLariatDefeat(o);
+      resolvePatternMember(o);
+      o.flying=true;sfxHit();
+      o.flyVx=10+Math.random()*3;
+      o.flyVy=-12-Math.random()*3;
+      o.flyRot=(Math.random()>.5?1:-1)*(0.3+Math.random()*0.2);
+      for(let i=0;i<12;i++)makeDust(o.x+o.w/2,oy+o.h/2,1);
+      continue;
+    }
+    die();break;
   }
  }
  obs=obs.filter(o=>o.x+o.w>-80 && (!o.flying || (o.y??0)<H+120));
