@@ -337,13 +337,14 @@ function updateScoreEffects(){
   passScoreNotices=passScoreNotices.filter(notice=>notice.life>0);
 }
 c.addEventListener('pointerdown',e=>{
-  // Left click / touch = jump. Right click is handled by contextmenu below.
-  if(e.button===2)return;
-  e.preventDefault();jump();
+  // Left click / touch = jump. Right press activates Sakata Mosh immediately.
+  e.preventDefault();
+  if(e.button===2){useLariat();return;}
+  jump();
 });
 c.addEventListener('contextmenu',e=>{
+  // Suppress the browser menu. Activation already happened on pointerdown.
   e.preventDefault();
-  useLariat();
 });
 document.querySelector('#lariatBtn').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();useLariat()});
 
