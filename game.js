@@ -116,7 +116,7 @@ function updateCycloneMeter(){
 }
 function updateItemHud(){
   const parts=[];
-  if(meatShield>0)parts.push(`🛡 GUARD ×${meatShield}`);
+  if(meatShield>0)parts.push('🛡 GUARD');
   document.querySelector('#meatHud').textContent=parts.join('　');
   updateCycloneMeter();
 }
@@ -676,7 +676,7 @@ function update(){
      it.taken=true;
      if(choiceItem){itemChanceChosen=true;itemChanceChosenAt=dist}
      if(it.type==='shield'){
-       meatShield++;
+       meatShield=1;
        scoreEffects.push({type:'itemNotice',text:'🛡 GUARD',color:'#d9efff',life:90,maxLife:90});
      }
      else if(it.type==='roadCharge'){
