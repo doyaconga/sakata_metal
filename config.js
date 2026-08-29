@@ -2,7 +2,7 @@ const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
-const DEBUG_SETTINGS_VERSION=2;
+const DEBUG_SETTINGS_VERSION=3;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','犬'],['cat','猫'],['birds','鳥'],['bats','コウモリ'],['snake','蛇'],['rabbit','ウサギ'],['cow','牛']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
 const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5};
@@ -13,11 +13,12 @@ const GAME_CONFIG={
   initialSpeed:6,
   speedStep:.39,
   maxSpeed:10,
-  lariatDurationFrames:180,  // 発動時間：約3秒（60フレーム＝1秒）
+  lariatDurationFrames:90,  // 発動時間：約1.5秒（60フレーム＝1秒）
   lariatCooldownFrames:1200, // 発動開始から再使用可能になるまで：約20秒。発動中も減少する
-  lariatWarningFrames:60,
-  lariatCriticalFrames:24,
+  lariatWarningFrames:30,
+  lariatCriticalFrames:12,
   lariatEndInvulnFrames:60,
+  lariatDefeatScore:50,
   cycloneRequiredPieces:5,
   cycloneDurationFrames:360,
   cycloneTargetCount:30,
@@ -109,13 +110,19 @@ function loadDebugSettings(){
   try{
     const saved=JSON.parse(localStorage.getItem(DEBUG_STORAGE_KEY)||'null');
     if(!saved||typeof saved!=='object')return;
-    if((saved._version||1)<DEBUG_SETTINGS_VERSION){
+    const savedVersion=saved._version||1;
+    if(savedVersion<2){
       if(Number(saved.cycloneRequiredPieces)===3)saved.cycloneRequiredPieces=5;
       if(Number(saved.cyclonePieceMin)===350&&Number(saved.cyclonePieceMax)===550){
         saved.cyclonePieceMin=200;saved.cyclonePieceMax=700;
       }
-      saved._version=DEBUG_SETTINGS_VERSION;
     }
+    if(savedVersion<3){
+      if(Number(saved.lariatDurationSec)===3)saved.lariatDurationSec=1.5;
+      if(Number(saved.lariatWarningSec)===1)saved.lariatWarningSec=.5;
+      if(Number(saved.lariatCriticalSec)===.4)saved.lariatCriticalSec=.2;
+    }
+    saved._version=DEBUG_SETTINGS_VERSION;
     applyDebugValues(saved);
     localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()));
   }catch(e){}

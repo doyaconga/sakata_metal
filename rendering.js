@@ -12,16 +12,6 @@ function drawScoreEffects(){
       x.strokeText(`${effect.combo} COMBO!`,0,-22);x.fillText(`${effect.combo} COMBO!`,0,-22);
       x.fillStyle='#fff';x.font='950 38px sans-serif';
       x.strokeText(`+${fmt(effect.points)}`,0,40);x.fillText(`+${fmt(effect.points)}`,0,40);
-    }else if(effect.type==='lariatResult'){
-      const rise=Math.min(18,age*.35);
-      x.translate(W/2,260-rise);
-      x.lineWidth=7;x.strokeStyle='rgba(20,5,5,.72)';
-      x.fillStyle='#ffcf3f';x.font='950 48px sans-serif';
-      x.strokeText('SAKATA MOSH RESULT',0,-55);x.fillText('SAKATA MOSH RESULT',0,-55);
-      x.fillStyle='#fff';x.font='950 35px sans-serif';
-      x.strokeText(`${effect.combo} COMBO`,0,0);x.fillText(`${effect.combo} COMBO`,0,0);
-      x.fillStyle='#ffe45c';x.font='950 40px sans-serif';
-      x.strokeText(`+${fmt(effect.bonus)} BONUS`,0,50);x.fillText(`+${fmt(effect.bonus)} BONUS`,0,50);
     }else if(effect.type==='cycloneResult'){
       const rise=Math.min(18,age*.28);
       x.translate(W/2,255-rise);
@@ -600,9 +590,9 @@ function draw(){
   for(const d of dusts){x.globalAlpha=d.life/30;x.fillStyle='#ddd';x.fillRect(d.x,d.y,4,4)}x.globalAlpha=1;
  document.querySelector('#scoreValue').textContent=fmt(displayedTotalScore);
  const scoreGain=document.querySelector('#scoreGain');
- const activeNoticeIds=new Set(passScoreNotices.map(notice=>String(notice.id)));
+ const activeNoticeIds=new Set(scoreGainNotices.map(notice=>String(notice.id)));
  [...scoreGain.children].forEach(node=>{if(!activeNoticeIds.has(node.dataset.noticeId))node.remove()});
- passScoreNotices.forEach(notice=>{
+ scoreGainNotices.forEach(notice=>{
    let node=scoreGain.querySelector(`[data-notice-id="${notice.id}"]`);
    if(!node){
      node=document.createElement('span');node.className='scoreGainNotice';node.dataset.noticeId=String(notice.id);node.textContent=`+${fmt(notice.points)}`;scoreGain.appendChild(node);

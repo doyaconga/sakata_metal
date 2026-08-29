@@ -44,7 +44,7 @@ let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActiv
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
 let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
-let displayedTotalScore=0,passScoreNotices=[],nextPassScoreNoticeId=1;
+let displayedTotalScore=0,scoreGainNotices=[],nextScoreGainNoticeId=1;
 const p={x:150,y:G-62,w:58,h:62,vy:0,jumps:0,on:true,rot:0};
 
 // Run game simulation at the original 60 updates per second regardless of
@@ -263,7 +263,7 @@ function reset(){
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
  scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
- displayedTotalScore=0;passScoreNotices=[];nextPassScoreNoticeId=1;
+ displayedTotalScore=0;scoreGainNotices=[];nextScoreGainNoticeId=1;
  Object.assign(p,{y:G-p.h,vy:0,jumps:0,on:true,rot:0});
  document.querySelector('#msg').classList.add('hidden');
  document.querySelector('#banner').classList.remove('show');
@@ -313,28 +313,30 @@ function registerLariatDefeat(o){
   if(o.defeated)return;
   o.defeated=true;
   scoreState.lariatCombo++;
+  const cycloneActive=cycloneState==='active';
   const index=scoreState.lariatCombo-1;
-  const points=index<GAME_CONFIG.comboScores.length?GAME_CONFIG.comboScores[index]:GAME_CONFIG.comboScoreCap;
+  const points=cycloneActive
+    ? (index<GAME_CONFIG.comboScores.length?GAME_CONFIG.comboScores[index]:GAME_CONFIG.comboScoreCap)
+    : GAME_CONFIG.lariatDefeatScore;
   scoreState.lariatBonus+=points;
   scoreState.bonus+=points;
   scoreState.defeated++;
   scoreState.bestCombo=Math.max(scoreState.bestCombo,scoreState.lariatCombo);
-  scoreEffects=scoreEffects.filter(e=>e.type!=='combo');
-  scoreEffects.push({type:'combo',combo:scoreState.lariatCombo,points,life:68,maxLife:68});
+  if(!cycloneActive)scoreGainNotices.push({id:nextScoreGainNoticeId++,points,life:55});
+  if(cycloneActive){
+    scoreEffects=scoreEffects.filter(e=>e.type!=='combo');
+    scoreEffects.push({type:'combo',combo:scoreState.lariatCombo,points,life:68,maxLife:68});
+  }
 }
 function finishLariatScoring(){
-  if(scoreState.lariatCombo>0){
-    scoreEffects=scoreEffects.filter(e=>e.type!=='combo');
-    scoreEffects.push({type:'lariatResult',combo:scoreState.lariatCombo,bonus:scoreState.lariatBonus,life:125,maxLife:125});
-  }
   scoreState.lariatCombo=0;scoreState.lariatBonus=0;
 }
 function updateScoreEffects(){
   for(const effect of scoreEffects)effect.life--;
   scoreEffects=scoreEffects.filter(effect=>effect.life>0);
   if(displayedTotalScore<getTotalScore())displayedTotalScore++;
-  passScoreNotices.forEach(notice=>notice.life--);
-  passScoreNotices=passScoreNotices.filter(notice=>notice.life>0);
+  scoreGainNotices.forEach(notice=>notice.life--);
+  scoreGainNotices=scoreGainNotices.filter(notice=>notice.life>0);
 }
 c.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right press activates Sakata Mosh immediately.
@@ -381,7 +383,7 @@ function registerAnimalPass(o){
  scoreState.passed++;
  scoreState.passBonus+=points;
  scoreState.bonus+=points;
- passScoreNotices.push({id:nextPassScoreNoticeId++,points,life:55});
+ scoreGainNotices.push({id:nextScoreGainNoticeId++,points,life:55});
 }
 function resolvePatternMember(o){
  if(o.cyclone||o.pid<0||o.passed)return;
