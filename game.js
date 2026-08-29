@@ -373,8 +373,10 @@ function advance(){
  pendingSeasonBanner=(stage-1)%4===0?SEASON_NAMES[season()]:'';
 }
 function registerAnimalPass(o){
- const points=GAME_CONFIG.passScores[o.type]||0;
- if(points<=0)return;
+ const basePoints=GAME_CONFIG.passScores[o.type]||0;
+ if(basePoints<=0)return;
+ const speedMultiplier=Math.min(GAME_CONFIG.passSpeedMultiplierCap,speed/GAME_CONFIG.initialSpeed);
+ const points=Math.round(basePoints*speedMultiplier);
  scoreState.passed++;
  scoreState.passBonus+=points;
  scoreState.bonus+=points;
