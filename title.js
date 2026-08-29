@@ -124,7 +124,7 @@ function stopTitleDemo(){
 
 function getScores(){
   try{
-    const a=JSON.parse(localStorage.getItem('zangiefAnimalTop10V2')||'[]');
+    const a=JSON.parse(localStorage.getItem('sakataPassScoreTop10V1')||'[]');
     return Array.isArray(a)?a
       .filter(r=>r&&Number.isFinite(r.totalScore))
       .map(r=>({totalScore:r.totalScore}))
@@ -138,7 +138,7 @@ function saveScoreRecord(record){
     const a=getScores();
     a.push(record);
     a.sort((a,b)=>b.totalScore-a.totalScore);
-    localStorage.setItem('zangiefAnimalTop10V2',JSON.stringify(a.slice(0,10)));
+    localStorage.setItem('sakataPassScoreTop10V1',JSON.stringify(a.slice(0,10)));
   }catch(e){
     // Saving a score is optional; game-over handling must continue even when
     // browser storage is unavailable or full.

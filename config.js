@@ -40,6 +40,7 @@ const GAME_CONFIG={
   itemChanceRanges:[[0,1500,600,800],[1500,3000,800,1000],[3000,Infinity,1000,1200]],
   itemChanceLeadMeters:30,
   itemChanceExitMeters:30,
+  passScores:{pig:50,turtle:50,frog:60,cat:60,birds:70,snake:80,cow:90,bats:90,rabbit:100,dog:100},
   comboScores:[100,150,200,250],
   comboScoreCap:300
 };

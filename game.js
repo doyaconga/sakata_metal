@@ -42,8 +42,9 @@ let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',
 let debugHitboxes=false;
 let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
-let scoreState={bonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
+let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
+let displayedTotalScore=0,passScoreNotices=[],nextPassScoreNoticeId=1;
 const p={x:150,y:G-62,w:58,h:62,vy:0,jumps:0,on:true,rot:0};
 
 // Run game simulation at the original 60 updates per second regardless of
@@ -58,7 +59,7 @@ function resetFrameClock(now=performance.now()){
 }
 
 let thunderLatch=false;
-function getTotalScore(){return Math.floor(dist)+scoreState.bonus}
+function getTotalScore(){return scoreState.bonus}
 function itemChanceInterval(atDistance=dist){
   const range=GAME_CONFIG.itemChanceRanges.find(r=>atDistance>=r[0]&&atDistance<r[1])||GAME_CONFIG.itemChanceRanges[GAME_CONFIG.itemChanceRanges.length-1];
   return range[2]+Math.random()*(range[3]-range[2]);
@@ -261,11 +262,13 @@ function reset(){
  items=[];meatShield=0;rescueInvuln=0;itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
- scoreState={bonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
+ scoreState={bonus:0,passed:0,passBonus:0,defeated:0,bestCombo:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
+ displayedTotalScore=0;passScoreNotices=[];nextPassScoreNoticeId=1;
  Object.assign(p,{y:G-p.h,vy:0,jumps:0,on:true,rot:0});
  document.querySelector('#msg').classList.add('hidden');
  document.querySelector('#banner').classList.remove('show');
- document.querySelector('#score').textContent='TOTAL SCORE 0';
+ document.querySelector('#scoreValue').textContent='0';
+ document.querySelector('#scoreGain').replaceChildren();
  document.querySelector('#sub').innerHTML=DEBUG_BUILD?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM NEXT ${fmt(nextItemChanceAt)}m</span>`:'';
  updateItemHud();
  const lb=document.querySelector('#lariatBtn');
@@ -329,6 +332,9 @@ function finishLariatScoring(){
 function updateScoreEffects(){
   for(const effect of scoreEffects)effect.life--;
   scoreEffects=scoreEffects.filter(effect=>effect.life>0);
+  if(displayedTotalScore<getTotalScore())displayedTotalScore++;
+  passScoreNotices.forEach(notice=>notice.life--);
+  passScoreNotices=passScoreNotices.filter(notice=>notice.life>0);
 }
 c.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right click is handled by contextmenu below.
@@ -365,6 +371,14 @@ function advance(){
  stage++;speed=Math.min(GAME_CONFIG.maxSpeed,speed+GAME_CONFIG.speedStep);
  let b=document.querySelector('#banner');b.textContent=`STAGE ${stage}`;b.classList.add('show');bannerT=85;
  pendingSeasonBanner=(stage-1)%4===0?SEASON_NAMES[season()]:'';
+}
+function registerAnimalPass(o){
+ const points=GAME_CONFIG.passScores[o.type]||0;
+ if(points<=0)return;
+ scoreState.passed++;
+ scoreState.passBonus+=points;
+ scoreState.bonus+=points;
+ passScoreNotices.push({id:nextPassScoreNoticeId++,points,life:55});
 }
 function resolvePatternMember(o){
  if(o.cyclone||o.pid<0||o.passed)return;
@@ -777,7 +791,11 @@ function update(){
   }else if(o.move==='bob'){
     o.y=o.baseY+Math.sin(o.age/o.period*Math.PI*2)*o.amp;
   }
-  if(!o.cyclone&&!o.passed && o.x+o.w<p.x){
+  const safelyPassed=o.type==='gap'
+    ? o.x+o.w<p.x
+    : obstacleHitboxes(o).every(hit=>hit.x+hit.w<=playerHitbox().x);
+  if(!o.cyclone&&!o.passed&&safelyPassed){
+    registerAnimalPass(o);
     resolvePatternMember(o);
   }
   if(o.type==='gap'){

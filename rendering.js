@@ -600,7 +600,16 @@ function draw(){
     x.restore();
   }
   for(const d of dusts){x.globalAlpha=d.life/30;x.fillStyle='#ddd';x.fillRect(d.x,d.y,4,4)}x.globalAlpha=1;
- document.querySelector('#score').textContent=`TOTAL SCORE ${fmt(getTotalScore())}`;
+ document.querySelector('#scoreValue').textContent=fmt(displayedTotalScore);
+ const scoreGain=document.querySelector('#scoreGain');
+ const activeNoticeIds=new Set(passScoreNotices.map(notice=>String(notice.id)));
+ [...scoreGain.children].forEach(node=>{if(!activeNoticeIds.has(node.dataset.noticeId))node.remove()});
+ passScoreNotices.forEach(notice=>{
+   let node=scoreGain.querySelector(`[data-notice-id="${notice.id}"]`);
+   if(!node){
+     node=document.createElement('span');node.className='scoreGainNotice';node.dataset.noticeId=String(notice.id);node.textContent=`+${fmt(notice.points)}`;scoreGain.appendChild(node);
+   }
+ });
  const debugItemLine=DEBUG_BUILD?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM ${itemChanceActive?'ACTIVE':(itemChancePending?'PREP ': 'NEXT ')+(itemChancePending?fmt(nextItemChanceAt):fmt(Math.max(dist,nextItemChanceAt)))+'m'}</span>`:'';
  document.querySelector('#sub').innerHTML=debugItemLine;
  x.restore();
