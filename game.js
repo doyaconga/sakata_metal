@@ -831,7 +831,9 @@ function update(){
    if(cycloneResultMusicDelay===0&&!titleMode&&run&&!paused)startBgm('game');
  }
  if(!cycloneActive)dist+=speed/12;
- groundOffset=(groundOffset+speed)%10000;
+ // Keep the background timeline continuous. Seasonal scenery handles its own
+ // off-screen looping, so resetting this value would visibly teleport it.
+ groundOffset+=speed;
  if(!cycloneActive&&!itemChanceActive&&!itemChancePending)spawnTimer-=speed;
  updateScoreEffects();
  if(rescueInvuln>0)rescueInvuln--;

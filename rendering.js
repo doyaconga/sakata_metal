@@ -77,6 +77,7 @@ function drawScoreEffects(){
 }
 function drawSeasonScenery(sn){
  x.save();
+ const loop=(value,size)=>((value%size)+size)%size;
  if(sn===0){
   // Spring: cherry trees and drifting petals.
   for(const tx of [115,520,875]){
@@ -85,7 +86,7 @@ function drawSeasonScenery(sn){
    for(const [dx,dy,r] of [[-30,0,34],[8,-22,42],[42,5,31],[-2,20,38]]){x.beginPath();x.arc(tx+dx,292+dy,r,0,7);x.fill()}
   }
   x.fillStyle='rgba(255,220,232,.85)';
-  for(let i=0;i<18;i++){const px=(i*181-groundOffset*.18)%1040-40,py=90+(i*67)%270;x.beginPath();x.ellipse(px,py,4,2,((i%5)-2)*.25,0,7);x.fill()}
+  for(let i=0;i<18;i++){const px=loop(i*181-groundOffset*.18,1040)-40,py=90+(i*67)%270;x.beginPath();x.ellipse(px,py,4,2,((i%5)-2)*.25,0,7);x.fill()}
  }else if(sn===1){
   // Summer: sea, beach and palm trees behind the play lane.
   x.fillStyle='rgba(39,151,207,.70)';x.fillRect(0,302,W,98);
@@ -113,7 +114,7 @@ function drawSeasonScenery(sn){
    x.globalAlpha=1;
   }
   x.fillStyle='rgba(224,119,44,.80)';
-  for(let i=0;i<16;i++){const px=(i*157-groundOffset*.22)%1040-40,py=110+(i*83)%285;x.save();x.translate(px,py);x.rotate(i+groundOffset*.002);x.fillRect(-5,-2,10,5);x.restore()}
+  for(let i=0;i<16;i++){const px=loop(i*157-groundOffset*.22,1040)-40,py=110+(i*83)%285;x.save();x.translate(px,py);x.rotate(i+groundOffset*.002);x.fillRect(-5,-2,10,5);x.restore()}
  }else{
   // Winter: snowfield, Christmas trees, snowmen and snow.
   x.fillStyle='rgba(229,241,248,.94)';x.strokeStyle='rgba(113,145,164,.34)';x.lineWidth=1.25;x.beginPath();x.moveTo(0,G);x.lineTo(0,365);x.quadraticCurveTo(180,330,350,370);x.quadraticCurveTo(610,320,960,365);x.lineTo(W,G);x.fill();x.stroke();
@@ -134,7 +135,7 @@ function drawSeasonScenery(sn){
    x.fillStyle='#26333c';for(const by of [375,392,407]){x.beginPath();x.arc(sx,by,3,0,7);x.fill()}
   }
   x.fillStyle='rgba(255,255,255,.82)';
-  for(let i=0;i<34;i++){const px=(i*137-groundOffset*.12)%1020-30,py=(i*79+groundOffset*.08)%420;x.beginPath();x.arc(px,py,2+(i%3),0,7);x.fill()}
+  for(let i=0;i<34;i++){const px=loop(i*137-groundOffset*.12,1020)-30,py=loop(i*79+groundOffset*.08,420);x.beginPath();x.arc(px,py,2+(i%3),0,7);x.fill()}
  }
  x.restore();
 }
