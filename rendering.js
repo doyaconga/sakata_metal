@@ -1,3 +1,13 @@
+// Shared by the live game and the how-to-play demos. Callers position and
+// rotate the context first, then this draws the standard Sakata sprite.
+function drawSakataSprite(ctx,size=76){
+ if(sakataImg.complete&&sakataImg.naturalWidth){
+   ctx.drawImage(sakataImg,-size/2,-size/2-size*.0526,size,size);
+ }else{
+   ctx.fillStyle='#8b2f2f';ctx.beginPath();ctx.arc(0,0,size*.368,0,Math.PI*2);ctx.fill();
+ }
+}
+
 function drawScoreEffects(){
   for(const effect of scoreEffects){
     const age=effect.maxLife-effect.life;
@@ -602,12 +612,7 @@ function draw(){
    }
    x.restore();
  }
- if(sakataImg.complete){
-   const size=76;
-   x.drawImage(sakataImg,-size/2,-size/2-4,size,size);
- }else{
-   x.fillStyle='#8b2f2f';x.beginPath();x.arc(0,0,28,0,Math.PI*2);x.fill();
- }
+ drawSakataSprite(x,76);
   x.restore();
  }
  for(const particle of hoverBreakParticles){
