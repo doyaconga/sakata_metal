@@ -383,6 +383,18 @@ function draw(){
     const catStep=Math.sin(stride*1.35)*7;x.fillStyle='#65514b';
     x.fillRect(o.w*.28+catStep,o.h*.76,6,o.h*.23);x.fillRect(o.w*.55-catStep,o.h*.76,6,o.h*.23);
 
+  } else if(o.type==='monkey'){
+    // Small monkey with a long curled tail. It faces left after the common flip.
+    x.strokeStyle='#4c3428';x.lineWidth=3;x.fillStyle='#8b5a3c';
+    x.beginPath();x.ellipse(o.w*.48,o.h*.62,o.w*.27,o.h*.24,0,0,Math.PI*2);x.fill();x.stroke();
+    x.beginPath();x.arc(o.w*.75,o.h*.38,o.h*.23,0,Math.PI*2);x.fill();x.stroke();
+    x.fillStyle='#d7a46c';x.beginPath();x.ellipse(o.w*.80,o.h*.47,o.w*.16,o.h*.13,0,0,Math.PI*2);x.fill();
+    x.fillStyle='#fff';x.beginPath();x.arc(o.w*.70,o.h*.35,3.5,0,Math.PI*2);x.arc(o.w*.80,o.h*.35,3.5,0,Math.PI*2);x.fill();
+    x.fillStyle='#111';x.beginPath();x.arc(o.w*.71,o.h*.35,1.5,0,Math.PI*2);x.arc(o.w*.81,o.h*.35,1.5,0,Math.PI*2);x.fill();
+    const monkeyStep=Math.sin(stride*1.2)*5;x.fillStyle='#5f3c2c';
+    x.fillRect(o.w*.30+monkeyStep,o.h*.76,6,o.h*.20);x.fillRect(o.w*.53-monkeyStep,o.h*.76,6,o.h*.20);
+    x.strokeStyle='#4c3428';x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(o.w*.24,o.h*.61);x.quadraticCurveTo(-3,o.h*.28,o.w*.12,o.h*.13);x.quadraticCurveTo(o.w*.24,o.h*.07,o.w*.20,o.h*.24);x.stroke();
+
   } else if(o.type==='snake'){
     // The snake leans forward toward Sakata as it rises.
     const lift=o.rearLift||0;
@@ -523,6 +535,13 @@ function draw(){
   }
   x.restore();
  }
+ for(const peel of bananaPeels){
+   x.save();x.translate(peel.x,peel.y);
+   x.strokeStyle='#8a6818';x.lineWidth=2;x.fillStyle=peel.landed?'#f2d15c':'#ffe47a';
+   x.beginPath();x.moveTo(2,0);x.quadraticCurveTo(10,-12,17,-2);x.quadraticCurveTo(23,-12,31,0);x.quadraticCurveTo(17,5,2,0);x.fill();x.stroke();
+   if(!peel.landed){x.fillStyle='#fff0a0';x.beginPath();x.arc(17,-4,3,0,Math.PI*2);x.fill()}
+   x.restore();
+ }
  if(!playerExploded){
  x.save();
  if(rescueInvuln>0 && Math.floor(rescueInvuln/5)%2===0)x.globalAlpha=.4;
@@ -608,6 +627,9 @@ function draw(){
     };
     for(const o of obs){
       obstacleHitboxes(o).forEach((box,i)=>drawHitbox(box,'#ff4d4d',i===0?o.type.toUpperCase():''));
+    }
+    for(const peel of bananaPeels){
+      if(peel.landed)drawHitbox({x:peel.x+3,y:peel.y-7,w:28,h:9},'#ffb21c','BANANA');
     }
     if(!playerExploded&&lariatEndInvuln<=0)drawHitbox(playerHitbox(),'#38e8ff','PLAYER');
     x.save();
