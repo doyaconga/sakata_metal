@@ -2,7 +2,7 @@ const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
-const DEBUG_SETTINGS_VERSION=7;
+const DEBUG_SETTINGS_VERSION=8;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ'],['monkey','サル'],['crow','カラス']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
 const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,frog:2,birds:2,cow:3,cat:3,snake:4,bats:4,rabbit:5,dog:5,monkey:5,crow:6};
@@ -36,7 +36,7 @@ const GAME_CONFIG={
   chargeIntervalMax:450,
   speedDownSteps:2,
   speedUpSteps:2,
-  hoverDurationFrames:300,
+  hoverDurationFrames:120,
   snakeCycleMinFrames:65,
   snakeCycleMaxFrames:135,
   catSpeedMultiplier:1.65,
@@ -129,6 +129,7 @@ function loadDebugSettings(){
     if(savedVersion<5&&Number(saved.maxSpeed)===10)saved.maxSpeed=15;
     if(savedVersion<6&&Array.isArray(saved.enabledAnimals)&&!saved.enabledAnimals.includes('monkey'))saved.enabledAnimals.push('monkey');
     if(savedVersion<7&&Array.isArray(saved.enabledAnimals)&&!saved.enabledAnimals.includes('crow'))saved.enabledAnimals.push('crow');
+    if(savedVersion<8&&Number(saved.hoverDurationSec)===5)saved.hoverDurationSec=2;
     saved._version=DEBUG_SETTINGS_VERSION;
     applyDebugValues(saved);
     localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()));
