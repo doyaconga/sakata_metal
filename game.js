@@ -40,7 +40,7 @@ let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],ba
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
 let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,cycloneResultMusicDelay=0,cycloneScoreRevealTimer=0,cycloneScoreRevealPoints=0,nextCyclonePieceAt=350;
 let debugHitboxes=false;
-let items=[],bananaPeels=[],meatShield=0,rescueInvuln=0,hoverFuelFrames=0,hoverHeld=false,hoverActive=false,hoverBreakParticles=[],itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
+let items=[],bananaPeels=[],crowDroppings=[],meatShield=0,rescueInvuln=0,hoverFuelFrames=0,hoverHeld=false,hoverActive=false,hoverBreakParticles=[],itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
 let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
@@ -264,7 +264,7 @@ function reset(){
  if(gameOverMessageTimeout!==null){clearTimeout(gameOverMessageTimeout);gameOverMessageTimeout=null;}
  run=true;
  dist=0;cleared=0;stage=GAME_CONFIG.startStage;speed=GAME_CONFIG.initialSpeed;spawnTimer=100;groundOffset=0;lariatTimer=0;lariatCooldown=0;lariatEndInvuln=0;thunderLatch=false;
- items=[];bananaPeels=[];meatShield=0;rescueInvuln=0;hoverFuelFrames=0;hoverHeld=false;hoverActive=false;hoverBreakParticles=[];itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
+ items=[];bananaPeels=[];crowDroppings=[];meatShield=0;rescueInvuln=0;hoverFuelFrames=0;hoverHeld=false;hoverActive=false;hoverBreakParticles=[];itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
  scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
@@ -384,6 +384,7 @@ function obstacleHitboxes(o){
   const oy=o.y??G-o.h;
   if(o.type==='birds')return [{x:o.x+44,y:oy+10,w:112,h:22}];
   if(o.type==='bats')return [{x:o.x+7,y:oy+3,w:o.w-14,h:o.h-7}];
+  if(o.type==='crow')return [{x:o.x+10,y:oy+6,w:o.w-20,h:o.h-12}];
   if(o.type==='snake'){
     const lift=o.rearLift||0;
     const baseY=oy+o.h-7;
@@ -430,6 +431,10 @@ function registerAnimalPass(o){
 function throwMonkeyBanana(o){
   o.bananaThrown=true;
   bananaPeels.push({x:o.x+o.w*.55,y:(o.y??G-o.h)+o.h*.32,vy:-11.5,throwVx:2.5,landed:false,life:240});
+}
+function dropCrowPoop(o){
+  o.droppingThrown=true;
+  crowDroppings.push({x:o.x+o.w*.48,y:(o.y??G-o.h)+o.h*.70,vy:0,landed:false,life:230});
 }
 function resolvePatternMember(o){
  if(o.cyclone||o.pid<0||o.passed)return;
@@ -493,7 +498,9 @@ function spawnPattern(){
   // only as much as needed to clear the flock.
   [{d:0,t:'cat',w:52,h:40},{d:300,t:'birds',w:175,h:42,y:G-72}],
   // Monkey leaves a banana peel behind after it has safely passed.
-  [{d:0,t:'monkey',w:60,h:54}]
+  [{d:0,t:'monkey',w:60,h:54}],
+  // Crow stays far above jump height and drops a ground hazard.
+  [{d:0,t:'crow',w:68,h:42,y:G-350}]
  ];
  // A pattern becomes available as soon as every animal in it has reached its
  // unlock stage. Once unlocked it remains in the draw pool for later stages.
@@ -549,9 +556,10 @@ function spawnPattern(){
      patrolAmp:q.t==='dog'?42:0,
      patrolPeriod:q.t==='dog'?115:1,
      dogDir:q.t==='dog'?-1:0,
-     dogTurnLeft:q.t==='dog'?250:0,
-     dogTurnRight:q.t==='dog'?430:0,
-     baseY:q.y??(G-q.h),
+    dogTurnLeft:q.t==='dog'?250:0,
+    dogTurnRight:q.t==='dog'?430:0,
+    crowDropLeadFrames:q.t==='crow'?30+Math.random()*30:0,
+    baseY:q.y??(G-q.h),
      age:q.move==='hop' ? Math.random()*(q.period||110) : Math.floor(Math.random()*60),
      prevPatrol:0,
       flying:false,flyVx:0,flyVy:0,flyRot:0,defeated:false
@@ -790,6 +798,7 @@ function update(){
   // The monkey throws before it passes Sakata. The lead scales with speed so
   // the high arc still lands soon after the monkey has passed at late stages.
   if(!o.cyclone&&o.type==='monkey'&&!o.bananaThrown&&o.x>p.x&&o.x-p.x<=speed*48)throwMonkeyBanana(o);
+  if(!o.cyclone&&o.type==='crow'&&!o.droppingThrown&&o.x>p.x&&o.x-p.x<=speed*(o.crowDropLeadFrames||48))dropCrowPoop(o);
 
   // Small contact dust makes ground animals feel planted without moving ground texture.
   if((o.type==='pig'||o.type==='dog'||o.type==='cat'||o.type==='turtle') && o.age%18===0 && o.x<W && o.x>0){
@@ -903,6 +912,23 @@ function update(){
    }
  }
  bananaPeels=bananaPeels.filter(peel=>!peel.used&&peel.life>0&&peel.x>-50&&peel.x<W+80);
+ for(const dropping of crowDroppings){
+   dropping.x-=speed;
+   if(!dropping.landed){
+     dropping.y+=dropping.vy;
+     dropping.vy+=.55;
+     if(dropping.y>=G-9){dropping.y=G-9;dropping.landed=true;dropping.vy=0}
+   }
+   dropping.life--;
+   const droppingHitbox=dropping.landed
+     ? {x:dropping.x+3,y:dropping.y-8,w:22,h:10}
+     : {x:dropping.x+4,y:dropping.y-6,w:12,h:12};
+   if(!dropping.used&&rect(playerHitbox(),droppingHitbox)){
+     dropping.used=true;
+     die('crow');
+   }
+ }
+ crowDroppings=crowDroppings.filter(dropping=>!dropping.used&&dropping.life>0&&dropping.x>-50&&dropping.x<W+80);
  for(const d of dusts){d.x+=d.vx;d.y+=d.vy;d.vy+=.1;d.life--}dusts=dusts.filter(d=>d.life>0);
  for(const particle of hoverBreakParticles){particle.x+=particle.vx;particle.y+=particle.vy;particle.vy+=.14;particle.life--}hoverBreakParticles=hoverBreakParticles.filter(particle=>particle.life>0);
  if(bannerT>0&&!--bannerT){

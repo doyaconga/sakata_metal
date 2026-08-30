@@ -2,10 +2,10 @@ const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
 const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
-const DEBUG_SETTINGS_VERSION=6;
-const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ'],['monkey','サル']];
+const DEBUG_SETTINGS_VERSION=7;
+const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ'],['monkey','サル'],['crow','カラス']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
-const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5,monkey:5};
+const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,cat:2,frog:2,birds:2,cow:3,snake:3,bats:4,rabbit:5,dog:5,monkey:5,crow:6};
 let debugEnabledAnimals=new Set(ANIMAL_TYPES);
 const GAME_CONFIG={
   startStage:1,
@@ -44,7 +44,7 @@ const GAME_CONFIG={
   itemChanceRanges:[[0,1500,600,800],[1500,3000,800,1000],[3000,Infinity,1000,1200]],
   itemChanceLeadMeters:30,
   itemChanceExitMeters:30,
-  passScores:{pig:50,turtle:50,frog:60,cat:60,birds:70,snake:80,cow:90,bats:90,rabbit:100,dog:100,monkey:100},
+  passScores:{pig:50,turtle:50,frog:60,cat:60,birds:70,snake:80,cow:90,bats:90,rabbit:100,dog:100,monkey:100,crow:100},
   passSpeedMultiplierCap:2,
   cycloneDefeatBaseScore:100,
   cycloneComboStepScore:5,
@@ -128,6 +128,7 @@ function loadDebugSettings(){
     }
     if(savedVersion<5&&Number(saved.maxSpeed)===10)saved.maxSpeed=15;
     if(savedVersion<6&&Array.isArray(saved.enabledAnimals)&&!saved.enabledAnimals.includes('monkey'))saved.enabledAnimals.push('monkey');
+    if(savedVersion<7&&Array.isArray(saved.enabledAnimals)&&!saved.enabledAnimals.includes('crow'))saved.enabledAnimals.push('crow');
     saved._version=DEBUG_SETTINGS_VERSION;
     applyDebugValues(saved);
     localStorage.setItem(DEBUG_STORAGE_KEY,JSON.stringify(currentDebugValues()));

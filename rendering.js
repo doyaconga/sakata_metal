@@ -495,6 +495,19 @@ function draw(){
       x.beginPath();x.moveTo(bx+10,by+11);x.lineTo(bx+18,by+14);x.lineTo(bx+10,by+16);x.closePath();x.fill();
     }
 
+  } else if(o.type==='crow'){
+    // Crow flies above jump height; only its dropping becomes a hazard.
+    const flap=Math.sin(stride*1.8)*8;
+    x.shadowColor='rgba(65,157,190,.48)';x.shadowBlur=6;
+    x.fillStyle='#465066';x.strokeStyle='#4f9fbe';x.lineWidth=2;
+    x.beginPath();x.ellipse(o.w*.48,o.h*.58,o.w*.21,o.h*.16,0,0,Math.PI*2);x.fill();x.stroke();
+    x.beginPath();x.arc(o.w*.70,o.h*.46,o.h*.16,0,Math.PI*2);x.fill();x.stroke();
+    x.beginPath();x.moveTo(o.w*.42,o.h*.57);x.lineTo(o.w*.17,o.h*.28-flap*.35);x.lineTo(o.w*.29,o.h*.70);x.closePath();x.fill();x.stroke();
+    x.beginPath();x.moveTo(o.w*.53,o.h*.57);x.lineTo(o.w*.37,o.h*.25+flap*.35);x.lineTo(o.w*.68,o.h*.70);x.closePath();x.fill();x.stroke();
+    x.fillStyle='#d7a64a';x.beginPath();x.moveTo(o.w*.83,o.h*.49);x.lineTo(o.w*.96,o.h*.54);x.lineTo(o.w*.83,o.h*.58);x.closePath();x.fill();
+    x.fillStyle='#f2efc8';x.beginPath();x.arc(o.w*.73,o.h*.42,2.5,0,Math.PI*2);x.fill();
+    x.shadowBlur=0;
+
   } else if(o.type==='bats'){
     // Bats: purple V-shaped swarm, pointed wings and ears, stronger vertical spread.
     const body='#665071';
@@ -540,6 +553,19 @@ function draw(){
    x.strokeStyle='#8a6818';x.lineWidth=2;x.fillStyle=peel.landed?'#f2d15c':'#ffe47a';
    x.beginPath();x.moveTo(2,0);x.quadraticCurveTo(10,-12,17,-2);x.quadraticCurveTo(23,-12,31,0);x.quadraticCurveTo(17,5,2,0);x.fill();x.stroke();
    if(!peel.landed){x.fillStyle='#fff0a0';x.beginPath();x.arc(17,-4,3,0,Math.PI*2);x.fill()}
+   x.restore();
+ }
+ for(const dropping of crowDroppings){
+   x.save();x.translate(dropping.x,dropping.y);
+   x.shadowColor='rgba(183,255,124,.75)';x.shadowBlur=dropping.landed?6:10;
+   x.fillStyle=dropping.landed?'#9bd85f':'#b9f27a';x.strokeStyle='#304229';x.lineWidth=1.5;
+   if(dropping.landed){
+     x.beginPath();x.ellipse(14,0,14,5,0,0,Math.PI*2);x.fill();x.stroke();
+     x.fillStyle='#fff3c1';x.beginPath();x.arc(14,-1,3,0,Math.PI*2);x.fill();
+   }else{
+     x.beginPath();x.arc(10,0,6,0,Math.PI*2);x.fill();x.stroke();
+     x.fillStyle='#fff3c1';x.beginPath();x.arc(8,-2,2,0,Math.PI*2);x.fill();
+   }
    x.restore();
  }
  if(!playerExploded){
@@ -630,6 +656,12 @@ function draw(){
     }
     for(const peel of bananaPeels){
       if(peel.landed)drawHitbox({x:peel.x+3,y:peel.y-7,w:28,h:9},'#ffb21c','BANANA');
+    }
+    for(const dropping of crowDroppings){
+      const droppingHitbox=dropping.landed
+        ? {x:dropping.x+3,y:dropping.y-8,w:22,h:10}
+        : {x:dropping.x+4,y:dropping.y-6,w:12,h:12};
+      drawHitbox(droppingHitbox,'#b9f27a','CROW POOP');
     }
     if(!playerExploded&&lariatEndInvuln<=0)drawHitbox(playerHitbox(),'#38e8ff','PLAYER');
     x.save();
