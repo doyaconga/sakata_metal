@@ -659,7 +659,9 @@ function spawnPattern(){
 }
 
 function die(deathCause){
- if(lariatTimer>0 || rescueInvuln>0)return;
+ // Every hazard, including bananas and crow droppings, respects the same
+ // post-Mosh invulnerability window as animal bodies.
+ if(lariatTimer>0 || lariatEndInvuln>0 || rescueInvuln>0)return;
  if(meatShield>0){
    meatShield--;
    rescueInvuln=90;
@@ -793,7 +795,9 @@ function update(){
    beginCyclonePreparation();
    return;
  }
- if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0)spawnPattern();
+ // A monkey encounter is not finished until its banana has left the course.
+ // This prevents the next animal pattern from stacking on top of that hazard.
+ if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0&&bananaPeels.length===0)spawnPattern();
  // The world scroll and animal actions share this scale. Without it, a fast
  // scroll lets moving hazards (especially the rabbit) pass before acting.
  // Use the normal gameplay baseline (speed 6), not the configurable starting
