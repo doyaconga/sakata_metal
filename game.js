@@ -1292,6 +1292,12 @@ document.querySelector('#helpClose').addEventListener('pointerdown',e=>{
   document.querySelector('#helpModal').classList.add('hidden');
   stopHelpDemo();
 });
+document.querySelector('#helpModal').addEventListener('pointerdown',e=>{
+  if(e.target!==e.currentTarget)return;
+  sfxButton();
+  e.currentTarget.classList.add('hidden');
+  stopHelpDemo();
+});
 for(const tab of document.querySelectorAll('.helpTab'))tab.addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
@@ -1328,6 +1334,10 @@ document.querySelector('#collectionClose').addEventListener('pointerdown',e=>{
   stopCollectionPreviews();
   document.querySelector('#collectionModal').classList.add('hidden');
 });
+document.querySelector('#collectionModal').addEventListener('pointerdown',e=>{
+  if(e.target!==e.currentTarget)return;
+  sfxButton();stopCollectionPreviews();e.currentTarget.classList.add('hidden');
+});
 document.querySelector('#collectionList').addEventListener('pointerdown',e=>{
   const button=e.target.closest('.collectionPlay');
   if(!button)return;
@@ -1345,6 +1355,16 @@ document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
     document.querySelector('#scoreModal').classList.add('hidden');
     document.body.classList.remove('scoreModalOpen');
   }
+});
+document.querySelector('#scoreModal').addEventListener('pointerdown',e=>{
+  if(e.target!==e.currentTarget)return;
+  sfxButton();
+  if(pauseRankingOpen)closePauseRanking();
+  else{e.currentTarget.classList.add('hidden');document.body.classList.remove('scoreModalOpen')}
+});
+document.querySelector('#recordModal').addEventListener('pointerdown',e=>{
+  if(e.target!==e.currentTarget)return;
+  sfxButton();e.currentTarget.classList.add('hidden');
 });
 document.querySelector('#debugBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();if(!DEBUG_BUILD)return;sfxButton();renderDebugSettings();setDebugStatus('');document.querySelector('#debugModal').classList.remove('hidden');
