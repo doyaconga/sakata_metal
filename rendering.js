@@ -465,7 +465,7 @@ function draw(){
     const body='#e2b94f';
     const outline='#765f25';
     const positions=[
-      [18,14],[58,8],[98,14],[138,8]
+      [20,14],[55,8],[90,14],[125,8]
     ];
     for(const [bx,by] of positions){
       x.strokeStyle=outline;x.lineWidth=3;x.fillStyle=body;

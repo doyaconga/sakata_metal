@@ -382,7 +382,7 @@ function rect(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function playerHitbox(){return {x:p.x+11,y:p.y+9,w:p.w-20,h:p.h-15}}
 function obstacleHitboxes(o){
   const oy=o.y??G-o.h;
-  if(o.type==='birds')return [{x:o.x+26,y:oy+6,w:o.w-34,h:o.h-12}];
+  if(o.type==='birds')return [{x:o.x+44,y:oy+10,w:112,h:22}];
   if(o.type==='bats')return [{x:o.x+7,y:oy+3,w:o.w-14,h:o.h-7}];
   if(o.type==='snake'){
     const lift=o.rearLift||0;
