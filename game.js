@@ -40,7 +40,7 @@ let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],ba
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
 let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,cycloneResultMusicDelay=0,cycloneScoreRevealTimer=0,cycloneScoreRevealPoints=0,nextCyclonePieceAt=350;
 let debugHitboxes=false;
-let items=[],meatShield=0,rescueInvuln=0,itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
+let items=[],meatShield=0,rescueInvuln=0,hoverFuelFrames=0,hoverHeld=false,hoverActive=false,hoverBreakParticles=[],itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
 let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
@@ -117,6 +117,7 @@ function updateCycloneMeter(){
 function updateItemHud(){
   const parts=[];
   if(meatShield>0)parts.push('🛡 GUARD');
+  if(hoverFuelFrames>0)parts.push('🚀 HOVER');
   document.querySelector('#meatHud').textContent=parts.join('　');
   updateCycloneMeter();
 }
@@ -131,7 +132,7 @@ function syncLariatReadyUi(){
 function beginItemChance(){
   itemChancePending=false;itemChanceActive=true;itemChanceChosen=false;itemChanceChosenAt=0;
   const group='choice-'+Math.floor(dist);
-  const choices=['shield','speedDown','speedUp'];
+  const choices=['shield','speedDown','speedUp','hover'];
   for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]]}
   items.push({type:choices[0],group,x:W+80,y:G-185,w:46,h:46,taken:false,bob:0});
   items.push({type:choices[1],group,x:W+80,y:G-70,w:46,h:46,taken:false,bob:Math.PI});
@@ -165,6 +166,7 @@ function beginCyclonePreparation(){
   cycloneState='escape';
   cycloneTimer=GAME_CONFIG.cycloneEscapeMaxFrames;
   cycloneSpinFrames=0;
+  hoverActive=false;
   items=[];
   itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;
   nextItemChanceAt=dist+itemChanceInterval(dist);
@@ -262,7 +264,7 @@ function reset(){
  if(gameOverMessageTimeout!==null){clearTimeout(gameOverMessageTimeout);gameOverMessageTimeout=null;}
  run=true;
  dist=0;cleared=0;stage=GAME_CONFIG.startStage;speed=GAME_CONFIG.initialSpeed;spawnTimer=100;groundOffset=0;lariatTimer=0;lariatCooldown=0;lariatEndInvuln=0;thunderLatch=false;
- items=[];meatShield=0;rescueInvuln=0;itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
+ items=[];meatShield=0;rescueInvuln=0;hoverFuelFrames=0;hoverHeld=false;hoverActive=false;hoverBreakParticles=[];itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
  scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
@@ -355,8 +357,13 @@ c.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right press activates Sakata Mosh immediately.
   e.preventDefault();
   if(e.button===2){useLariat();return;}
+  hoverHeld=true;
   jump();
 });
+c.addEventListener('pointerup',()=>{hoverHeld=false});
+c.addEventListener('pointercancel',()=>{hoverHeld=false});
+window.addEventListener('pointerup',()=>{hoverHeld=false});
+window.addEventListener('blur',()=>{hoverHeld=false});
 c.addEventListener('contextmenu',e=>{
   // Suppress the browser menu. Activation already happened on pointerdown.
   e.preventDefault();
@@ -364,6 +371,13 @@ c.addEventListener('contextmenu',e=>{
 document.querySelector('#lariatBtn').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();useLariat()});
 
 function makeDust(px,py,n){for(let i=0;i<n;i++)dusts.push({x:px,y:py,vx:-Math.random()*2,vy:-1-Math.random()*2,life:30})}
+function breakHoverDevice(){
+  const bx=p.x+2,by=p.y+25;
+  for(let i=0;i<12;i++){
+    const life=16+Math.floor(Math.random()*9);
+    hoverBreakParticles.push({x:bx+(Math.random()-.5)*10,y:by+(Math.random()-.5)*12,vx:(Math.random()-.5)*4,vy:-1.5-Math.random()*3,life,maxLife:life,size:2+Math.random()*3,hot:i<5});
+  }
+}
 function rect(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function playerHitbox(){return {x:p.x+11,y:p.y+9,w:p.w-20,h:p.h-15}}
 function obstacleHitboxes(o){
@@ -663,17 +677,23 @@ function update(){
  }
  if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0)spawnPattern();
  const timeScale=Math.max(1,speed/6);
- p.vy+=.67*timeScale;
+ hoverActive=hoverFuelFrames>0&&hoverHeld&&!p.on&&p.vy>=-1;
+ if(hoverActive){
+   p.vy=0;
+   hoverFuelFrames--;
+   if(hoverFuelFrames===0){breakHoverDevice();updateItemHud()}
+ }else p.vy+=.67*timeScale;
  p.y+=p.vy*timeScale;
- if(p.y+p.h>=G){p.y=G-p.h;p.vy=0;if(!p.on)makeDust(p.x+8,G,5);p.on=true;p.jumps=0}else p.on=false;
+ if(p.y+p.h>=G){p.y=G-p.h;p.vy=0;if(!p.on)makeDust(p.x+8,G,5);p.on=true;p.jumps=0;hoverActive=false}else p.on=false;
  if(cycloneActive)p.rot+=GAME_CONFIG.cycloneSpinSpeed;
+ else if(hoverFuelFrames>0)p.rot=0;
  else p.rot=p.on?0:p.rot+.11;
 
  // Rescue shield pickup
  for(const it of items){
    const itemHit={x:it.x+3,y:it.y+3,w:it.w-6,h:it.h-6};
    const playerHit={x:p.x+11,y:p.y+9,w:p.w-20,h:p.h-15};
-   const choiceItem=it.type==='shield'||it.type==='speedDown'||it.type==='speedUp';
+   const choiceItem=it.type==='shield'||it.type==='speedDown'||it.type==='speedUp'||it.type==='hover';
    if((!choiceItem||!itemChanceChosen) && !it.taken && rect(playerHit,itemHit)){
      it.taken=true;
      if(choiceItem){itemChanceChosen=true;itemChanceChosenAt=dist}
@@ -696,6 +716,11 @@ function update(){
      else if(it.type==='speedUp'){
        speed=Math.min(GAME_CONFIG.maxSpeed,speed+GAME_CONFIG.speedStep*GAME_CONFIG.speedUpSteps);
        scoreEffects.push({type:'itemNotice',text:'🐈 SPEED UP',color:'#ffd17c',life:90,maxLife:90});
+     }
+     else if(it.type==='hover'){
+       hoverFuelFrames=GAME_CONFIG.hoverDurationFrames;
+       p.rot=0;
+       scoreEffects.push({type:'itemNotice',text:`🚀 HOVER ${GAME_CONFIG.hoverDurationFrames/60} SEC`,color:'#9fefff',life:90,maxLife:90});
      }
      updateItemHud();
      sfxButton();
@@ -840,6 +865,7 @@ function update(){
  }
  obs=obs.filter(o=>o.x+o.w>-80 && (!o.flying || (o.y??0)<H+120));
  for(const d of dusts){d.x+=d.vx;d.y+=d.vy;d.vy+=.1;d.life--}dusts=dusts.filter(d=>d.life>0);
+ for(const particle of hoverBreakParticles){particle.x+=particle.vx;particle.y+=particle.vy;particle.vy+=.14;particle.life--}hoverBreakParticles=hoverBreakParticles.filter(particle=>particle.life>0);
  if(bannerT>0&&!--bannerT){
    document.querySelector('#banner').classList.remove('show');
    if(pendingSeasonBanner)bannerGapT=24;
