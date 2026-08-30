@@ -74,6 +74,22 @@ function saveScoreRecord(record){
   try{const scores=getScores();scores.push(record);scores.sort((a,b)=>b.totalScore-a.totalScore);localStorage.setItem('sakataPassScoreTop10V1',JSON.stringify(scores.slice(0,10)))}catch(error){}
 }
 const PLAY_STATS_STORAGE_KEY='sakataPlayStatsV1';
+const COLLECTION_STORAGE_KEY='sakataAnimalCollectionV1';
+function getCollection(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(COLLECTION_STORAGE_KEY)||'[]');
+    return new Set(Array.isArray(saved)?saved.filter(type=>ANIMAL_TYPES.includes(type)):[]);
+  }catch(error){return new Set()}
+}
+function registerCollectionAnimal(type){
+  if(!ANIMAL_TYPES.includes(type))return;
+  try{
+    const collection=getCollection();
+    if(collection.has(type))return;
+    collection.add(type);
+    localStorage.setItem(COLLECTION_STORAGE_KEY,JSON.stringify([...collection]));
+  }catch(error){}
+}
 function emptyPlayStats(){return {distanceBest:0,distanceTotal:0,passedBest:0,passedTotal:0,defeatedBest:0,defeatedTotal:0,deaths:{}}}
 function getPlayStats(){
   const empty=emptyPlayStats();
@@ -114,6 +130,19 @@ function showPlayRecords(){
   if(deaths.length===0){const row=document.createElement('div');row.className='deathRow empty';row.textContent='まだ記録なし';deathList.appendChild(row)}
   else deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
   document.querySelector('#recordModal').classList.remove('hidden');
+}
+function showCollection(){
+  const collection=getCollection(),names=Object.fromEntries(ANIMAL_OPTIONS);
+  const icons={pig:'🐷',turtle:'🐢',frog:'🐸',birds:'🐦',cow:'🐮',cat:'🐱',snake:'🐍',bats:'🦇',rabbit:'🐰',dog:'🐶',monkey:'🐵',crow:'🐦‍⬛'};
+  const list=document.querySelector('#collectionList');list.replaceChildren();
+  for(const [type,name] of ANIMAL_OPTIONS){
+    const discovered=collection.has(type),card=document.createElement('div');card.className=`collectionCard${discovered?'':' locked'}`;
+    const icon=document.createElement('div');icon.className='collectionIcon';icon.textContent=discovered?(icons[type]||'🐾'):'●';
+    const label=document.createElement('div');label.className='collectionName';label.textContent=discovered?name:'？？？';
+    card.append(icon,label);list.appendChild(card);
+  }
+  document.querySelector('#collectionProgress').textContent=`発見した動物　${collection.size} / ${ANIMAL_TYPES.length}`;
+  document.querySelector('#collectionModal').classList.remove('hidden');
 }
 function showScores(){
   const list=document.querySelector('#scoreList'),scores=getScores();list.innerHTML='';
@@ -272,6 +301,7 @@ function spawnCycloneTarget(){
   const candidates=laneTypes[lane].filter(type=>debugEnabledAnimals.has(type));
   const pool=candidates.length?candidates:enabled;
   const type=pool[Math.floor(Math.random()*pool.length)]||'pig';
+  registerCollectionAnimal(type);
   const [w,h]=defs[type]||defs.pig;
   const targetY=lane==='high'?120:(lane==='mid'?250:G-h);
   obs.push({x:W+40,type,w,h,y:targetY,baseY:targetY,passed:false,pid:-1,move:null,amp:0,period:1,extra:0,trigger:0,jumpV:0,reacted:false,localVy:0,speedMul:1,patrolAmp:0,patrolPeriod:1,dogDir:0,dogTurnLeft:0,dogTurnRight:0,age:0,prevPatrol:0,flying:false,flyVx:0,flyVy:0,flyRot:0,defeated:false,cyclone:true,cycloneLane:lane});
@@ -631,6 +661,7 @@ function spawnPattern(){
  const pid=patternSeq++;
  for(const q of pat){
    animalSpawnCounts[q.t]=(animalSpawnCounts[q.t]||0)+1;
+   registerCollectionAnimal(q.t);
    obs.push({
      x:base+q.d,type:q.t,w:q.w,h:q.h,y:q.y,passed:false,pid,
      move:q.move||null,amp:q.amp||0,
@@ -1216,6 +1247,19 @@ document.querySelector('#recordClose').addEventListener('pointerdown',e=>{
   e.stopPropagation();
   sfxButton();
   document.querySelector('#recordModal').classList.add('hidden');
+});
+document.querySelector('#collectionBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  initAudio();
+  sfxButton();
+  showCollection();
+});
+document.querySelector('#collectionClose').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  sfxButton();
+  document.querySelector('#collectionModal').classList.add('hidden');
 });
 document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
   e.preventDefault();
