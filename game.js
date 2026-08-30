@@ -384,6 +384,21 @@ function obstacleHitboxes(o){
   const oy=o.y??G-o.h;
   if(o.type==='birds')return [{x:o.x+26,y:oy+6,w:o.w-34,h:o.h-12}];
   if(o.type==='bats')return [{x:o.x+7,y:oy+3,w:o.w-14,h:o.h-7}];
+  if(o.type==='snake'){
+    const lift=o.rearLift||0;
+    const baseY=oy+o.h-7;
+    // Snake art is mirrored to face left, so these coordinates mirror the
+    // drawing's local body, neck, and head positions.
+    const anchorX=o.x+o.w*.32,anchorY=baseY-2;
+    const headX=o.x+o.w*(.20-.35*lift),headY=baseY-(1+lift*o.h*.70);
+    const hits=[{x:o.x+o.w*.32,y:baseY-11,w:o.w*.67,h:12}];
+    for(let i=1;i<=4;i++){
+      const t=i/4,cx=anchorX+(headX-anchorX)*t,cy=anchorY+(headY-anchorY)*t;
+      hits.push({x:cx-6,y:cy-6,w:12,h:12});
+    }
+    hits.push({x:headX-11,y:headY-8,w:22,h:16});
+    return hits;
+  }
   if(o.type==='cow')return [
     {x:o.x+5,y:oy+20,w:47,h:51},
     {x:o.x+40,y:oy+37,w:52,h:15},
@@ -440,7 +455,7 @@ function spawnPattern(){
   // Frog periodically hops; the timing is predictable.
   [{d:0,t:'frog',w:46,h:36,move:'hop',amp:105,period:110}],
   // Snake periodically raises its head, changing required jump height.
-  [{d:0,t:'snake',w:86,h:18,move:'rear',amp:70,period:150}],
+  [{d:0,t:'snake',w:100,h:18,move:'rear',amp:80,period:150}],
   // Rabbit jumps when the player gets close.
   [{d:0,t:'rabbit',w:44,h:38,move:'react',trigger:250,jumpV:-12.5}]
  ];
@@ -452,7 +467,7 @@ function spawnPattern(){
   // Cow: large obstacle intended to require a two-stage jump.
   [{d:0,t:'cow',w:115,h:107}],
   // Rabbit then snake: reaction plus height-read, spaced safely.
-  [{d:0,t:'rabbit',w:44,h:38,move:'react',trigger:260,jumpV:-12.5},{d:320,t:'snake',w:86,h:18,move:'rear',amp:70,period:150}]
+  [{d:0,t:'rabbit',w:44,h:38,move:'react',trigger:260,jumpV:-12.5},{d:320,t:'snake',w:100,h:18,move:'rear',amp:80,period:150}]
  ];
  const compound=[
   // Clear the cow with one jump and land to run under the bats. A needless

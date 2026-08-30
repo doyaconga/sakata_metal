@@ -384,7 +384,7 @@ function draw(){
     x.fillRect(o.w*.28+catStep,o.h*.76,6,o.h*.23);x.fillRect(o.w*.55-catStep,o.h*.76,6,o.h*.23);
 
   } else if(o.type==='snake'){
-    // Chibi snake: long ground coil plus a clearly raised neck/head.
+    // The snake leans forward toward Sakata as it rises.
     const lift=o.rearLift||0;
     x.strokeStyle='#2f6538';x.lineWidth=7;x.lineCap='round';
     x.fillStyle='#68b96d';
@@ -397,29 +397,31 @@ function draw(){
     x.bezierCurveTo(o.w*.54,baseY-8,o.w*.62,baseY+5,o.w*.68,baseY-2);
     x.stroke();
 
-    // Neck rises dramatically when active.
-    const headY=Math.max(11, o.h*(0.18 + (1-lift)*0.42));
-    const neckX=o.w*.73;
+    // Art is mirrored for left-facing animals, so local right is forward.
+    // The raised neck therefore reaches farther toward Sakata on screen.
+    const anchorX=o.w*.68,anchorY=baseY-2;
+    const headX=o.w*(.80+.35*lift);
+    const headY=baseY-(1+lift*o.h*.70);
     x.beginPath();
-    x.moveTo(o.w*.64,baseY-2);
-    x.quadraticCurveTo(neckX,baseY-o.h*.28,neckX,headY+9);
+    x.moveTo(anchorX,anchorY);
+    x.quadraticCurveTo(anchorX+o.w*.18,baseY-o.h*.42,headX,headY+8);
     x.stroke();
 
     // Large head.
     x.strokeStyle='#2f6538';x.lineWidth=3;
-    x.beginPath();x.ellipse(o.w*.78,headY,13,10,0,0,Math.PI*2);x.fill();x.stroke();
+    x.beginPath();x.ellipse(headX,headY,13,10,0,0,Math.PI*2);x.fill();x.stroke();
 
     // Eyes.
     x.fillStyle='#fff';
-    x.beginPath();x.arc(o.w*.74,headY-2,3.5,0,Math.PI*2);x.arc(o.w*.82,headY-2,3.5,0,Math.PI*2);x.fill();
+    x.beginPath();x.arc(headX-4,headY-2,3.5,0,Math.PI*2);x.arc(headX+4,headY-2,3.5,0,Math.PI*2);x.fill();
     x.fillStyle='#111';
-    x.beginPath();x.arc(o.w*.75,headY-2,1.6,0,Math.PI*2);x.arc(o.w*.83,headY-2,1.6,0,Math.PI*2);x.fill();
+    x.beginPath();x.arc(headX-4.5,headY-2,1.6,0,Math.PI*2);x.arc(headX+3.5,headY-2,1.6,0,Math.PI*2);x.fill();
 
     // Tongue when raised, making the high state extra obvious.
     if(lift>0.55){
       x.strokeStyle='#c64e62';x.lineWidth=2;
-      x.beginPath();x.moveTo(o.w*.91,headY+2);x.lineTo(o.w*.99,headY+2);x.lineTo(o.w*1.03,headY-1);
-      x.moveTo(o.w*.99,headY+2);x.lineTo(o.w*1.03,headY+5);x.stroke();
+      x.beginPath();x.moveTo(headX+12,headY+2);x.lineTo(headX+20,headY+2);x.lineTo(headX+24,headY-1);
+      x.moveTo(headX+20,headY+2);x.lineTo(headX+24,headY+5);x.stroke();
     }
 
   } else if(o.type==='rabbit'){
