@@ -131,15 +131,81 @@ function showPlayRecords(){
   else deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
   document.querySelector('#recordModal').classList.remove('hidden');
 }
+let collectionPreviewRaf=null,collectionPreviewFrame=0,collectionPreviewLast=0,collectionPreviewType=null;
+const COLLECTION_ANIMAL_INFO={pig:'基本の動物。地面をまっすぐ進む',turtle:'ゆっくり地面を進む',frog:'大きくジャンプする',birds:'低い位置を群れで飛ぶ',cow:'大きな体で道をふさぐ',cat:'すばやく走り込んでくる',snake:'頭を持ち上げて前へ伸びる',bats:'高い位置を群れで飛ぶ',rabbit:'近づくとジャンプする',dog:'通過後に戻ってくる',monkey:'通過後にバナナを投げる',crow:'高い場所からフンを落とす'};
+function collectionPreviewLength(type){return type==='turtle'?320:((type==='birds'||type==='bats')?220:200)}
+function collectionPreviewObject(type,frame,playing=false){
+  const sizes={pig:[64,48],turtle:[58,34],frog:[46,36],dog:[58,42],cat:[52,40],birds:[175,42],bats:[175,58],snake:[100,42],rabbit:[44,38],cow:[115,107],monkey:[60,54],crow:[68,42]};
+  const [w,h]=sizes[type]||sizes.pig;
+  const high=type==='crow',mid=type==='bats',cycle=frame;
+  const moveSpeed=type==='turtle'?1.2:(type==='cat'?3.8:2.5);
+  // The preview crop runs from x=330 to x=630, so its center is x=480.
+  // Waiting animals are centered by their actual game collision width.
+  let movingX=playing?630-cycle*moveSpeed:480-w/2,dogDir=-1;
+  if(type==='dog'&&cycle>80){movingX=430+(cycle-80)*2.7;dogDir=1}
+  const o={type,x:movingX,w,h,y:high?G-350:(mid?G-210:G-h),baseY:0,age:frame,dogDir,flying:false,flyRot:0,rearLift:0};
+  o.baseY=o.y;
+  if(type==='frog')o.y-=Math.max(0,Math.sin(frame*.11))*58;
+  if(type==='rabbit')o.y-=Math.max(0,Math.sin(frame*.11))*48;
+  if(type==='snake')o.rearLift=(Math.sin(frame*.08)+1)/2;
+  if(type==='bats')o.y+=Math.sin(frame*.12)*9;
+  return o;
+}
+function drawCollectionPreview(canvas,type,frame,playing=false){
+  const saved={obs,items,bananaPeels,crowDroppings,scoreEffects};
+  const preview=collectionPreviewObject(type,frame,playing),cycle=frame%155;
+  obs=[preview];items=[];bananaPeels=[];crowDroppings=[];scoreEffects=[];
+  if(type==='monkey'&&cycle>58){
+    const t=Math.min(42,cycle-58),y=Math.min(G-4,G-65-8*t+.27*t*t);
+    bananaPeels=[{x:preview.x+35+3*t,y,landed:y>=G-4}];
+  }
+  if(type==='crow'&&cycle>42){
+    const t=Math.min(55,cycle-42),y=Math.min(G-4,preview.y+28+.34*t*t);
+    crowDroppings=[{x:preview.x+32,y,landed:y>=G-4}];
+  }
+  draw();
+  const ctx=canvas.getContext('2d'),sourceY=type==='crow'?10:(type==='bats'?G-300:G-205);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(c,330,sourceY,300,225,0,0,canvas.width,canvas.height);
+  obs=saved.obs;items=saved.items;bananaPeels=saved.bananaPeels;crowDroppings=saved.crowDroppings;scoreEffects=saved.scoreEffects;
+}
+function animateCollectionPreviews(now){
+  if(document.querySelector('#collectionModal').classList.contains('hidden')||!collectionPreviewType){collectionPreviewRaf=null;return}
+  if(now-collectionPreviewLast>32){
+    collectionPreviewLast=now;collectionPreviewFrame+=2;
+    const canvas=document.querySelector(`.collectionPreview[data-animal="${collectionPreviewType}"]`);
+    if(canvas)drawCollectionPreview(canvas,collectionPreviewType,collectionPreviewFrame,true);
+    if(collectionPreviewFrame>=collectionPreviewLength(collectionPreviewType)){
+      if(canvas)drawCollectionPreview(canvas,collectionPreviewType,0);
+      collectionPreviewType=null;collectionPreviewRaf=null;return;
+    }
+  }
+  collectionPreviewRaf=requestAnimationFrame(animateCollectionPreviews);
+}
+function startCollectionPreview(type){
+  if(collectionPreviewType&&collectionPreviewType!==type){
+    const previous=document.querySelector(`.collectionPreview[data-animal="${collectionPreviewType}"]`);
+    if(previous)drawCollectionPreview(previous,collectionPreviewType,0);
+  }
+  collectionPreviewType=type;collectionPreviewFrame=0;collectionPreviewLast=0;
+  const canvas=document.querySelector(`.collectionPreview[data-animal="${type}"]`);
+  if(canvas)drawCollectionPreview(canvas,type,0,true);
+  if(collectionPreviewRaf===null)collectionPreviewRaf=requestAnimationFrame(animateCollectionPreviews);
+}
+function stopCollectionPreviews(){collectionPreviewType=null;if(collectionPreviewRaf!==null){cancelAnimationFrame(collectionPreviewRaf);collectionPreviewRaf=null}}
 function showCollection(){
-  const collection=getCollection(),names=Object.fromEntries(ANIMAL_OPTIONS);
-  const icons={pig:'🐷',turtle:'🐢',frog:'🐸',birds:'🐦',cow:'🐮',cat:'🐱',snake:'🐍',bats:'🦇',rabbit:'🐰',dog:'🐶',monkey:'🐵',crow:'🐦‍⬛'};
+  const collection=getCollection();
   const list=document.querySelector('#collectionList');list.replaceChildren();
   for(const [type,name] of ANIMAL_OPTIONS){
     const discovered=collection.has(type),card=document.createElement('div');card.className=`collectionCard${discovered?'':' locked'}`;
-    const icon=document.createElement('div');icon.className='collectionIcon';icon.textContent=discovered?(icons[type]||'🐾'):'●';
+    const icon=discovered?document.createElement('canvas'):document.createElement('div');
+    icon.className=discovered?'collectionPreview':'collectionIcon';
+    if(discovered){icon.width=240;icon.height=180;icon.dataset.animal=type;drawCollectionPreview(icon,type,0)}else icon.textContent='●';
     const label=document.createElement('div');label.className='collectionName';label.textContent=discovered?name:'？？？';
-    card.append(icon,label);list.appendChild(card);
+    const comment=document.createElement('div');comment.className='collectionComment';comment.textContent=discovered?COLLECTION_ANIMAL_INFO[type]:'';
+    card.append(icon,label,comment);
+    if(discovered){const play=document.createElement('button');play.className='collectionPlay';play.type='button';play.dataset.animal=type;play.textContent='▶ 再生';card.appendChild(play)}
+    list.appendChild(card);
   }
   document.querySelector('#collectionProgress').textContent=`発見した動物　${collection.size} / ${ANIMAL_TYPES.length}`;
   document.querySelector('#collectionModal').classList.remove('hidden');
@@ -1259,7 +1325,16 @@ document.querySelector('#collectionClose').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
   sfxButton();
+  stopCollectionPreviews();
   document.querySelector('#collectionModal').classList.add('hidden');
+});
+document.querySelector('#collectionList').addEventListener('pointerdown',e=>{
+  const button=e.target.closest('.collectionPlay');
+  if(!button)return;
+  e.preventDefault();
+  e.stopPropagation();
+  sfxButton();
+  startCollectionPreview(button.dataset.animal);
 });
 document.querySelector('#scoreClose').addEventListener('pointerdown',e=>{
   e.preventDefault();
