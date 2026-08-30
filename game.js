@@ -1,4 +1,7 @@
 const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
+// The title screen is the initial scene. This used to live in the removed
+// title-demo script, but the game itself also relies on it for screen changes.
+let titleMode=true;
 const sakataImg=new Image();sakataImg.src='assets/sakata.png';
 function renderDebugSettings(){
   const fields=document.querySelector('#debugFields');fields.innerHTML='';
@@ -60,6 +63,65 @@ function resetFrameClock(now=performance.now()){
 
 let thunderLatch=false;
 function getTotalScore(){return scoreState.bonus}
+function getScores(){
+  try{
+    const scores=JSON.parse(localStorage.getItem('sakataPassScoreTop10V1')||'[]');
+    return Array.isArray(scores)?scores.filter(record=>record&&Number.isFinite(record.totalScore)).map(record=>({totalScore:record.totalScore})).sort((a,b)=>b.totalScore-a.totalScore).slice(0,10):[];
+  }catch(error){return []}
+}
+function saveScoreRecord(record){
+  if(!record||!Number.isFinite(record.totalScore)||record.totalScore<=0)return;
+  try{const scores=getScores();scores.push(record);scores.sort((a,b)=>b.totalScore-a.totalScore);localStorage.setItem('sakataPassScoreTop10V1',JSON.stringify(scores.slice(0,10)))}catch(error){}
+}
+const PLAY_STATS_STORAGE_KEY='sakataPlayStatsV1';
+function emptyPlayStats(){return {distanceBest:0,distanceTotal:0,passedBest:0,passedTotal:0,defeatedBest:0,defeatedTotal:0,deaths:{}}}
+function getPlayStats(){
+  const empty=emptyPlayStats();
+  try{
+    const saved=JSON.parse(localStorage.getItem(PLAY_STATS_STORAGE_KEY)||'null');
+    if(!saved||typeof saved!=='object')return empty;
+    for(const key of ['distanceBest','distanceTotal','passedBest','passedTotal','defeatedBest','defeatedTotal']){
+      const value=Number(saved[key]);empty[key]=Number.isFinite(value)&&value>0?Math.floor(value):0;
+    }
+    if(saved.deaths&&typeof saved.deaths==='object')for(const type of ANIMAL_TYPES){
+      const value=Number(saved.deaths[type]);if(Number.isFinite(value)&&value>0)empty.deaths[type]=Math.floor(value);
+    }
+  }catch(error){}
+  return empty;
+}
+function savePlayStats(record){
+  if(!record)return;
+  try{
+    const stats=getPlayStats();
+    const distance=Math.max(0,Math.floor(Number(record.distance)||0));
+    const passed=Math.max(0,Math.floor(Number(record.passed)||0));
+    const defeated=Math.max(0,Math.floor(Number(record.defeated)||0));
+    stats.distanceBest=Math.max(stats.distanceBest,distance);stats.distanceTotal+=distance;
+    stats.passedBest=Math.max(stats.passedBest,passed);stats.passedTotal+=passed;
+    stats.defeatedBest=Math.max(stats.defeatedBest,defeated);stats.defeatedTotal+=defeated;
+    if(ANIMAL_TYPES.includes(record.deathCause))stats.deaths[record.deathCause]=(stats.deaths[record.deathCause]||0)+1;
+    localStorage.setItem(PLAY_STATS_STORAGE_KEY,JSON.stringify(stats));
+  }catch(error){}
+}
+function showPlayRecords(){
+  const stats=getPlayStats(),table=document.querySelector('#recordStats');table.replaceChildren();
+  const rows=[['移動した距離',`${fmt(stats.distanceBest)}m`,`${fmt(stats.distanceTotal)}m`],['突破した動物',fmt(stats.passedBest),fmt(stats.passedTotal)],['倒した動物',fmt(stats.defeatedBest),fmt(stats.defeatedTotal)]];
+  for(const text of ['項目','最高','累計']){const cell=document.createElement('span');cell.className='recordHeader';cell.textContent=text;table.appendChild(cell)}
+  for(const row of rows)for(const text of row){const cell=document.createElement('span');cell.textContent=text;table.appendChild(cell)}
+  const deathList=document.querySelector('#deathList');deathList.replaceChildren();
+  const names=Object.fromEntries(ANIMAL_OPTIONS);
+  const deaths=ANIMAL_TYPES.map((type,index)=>({type,index,count:stats.deaths[type]||0})).filter(item=>item.count>0).sort((a,b)=>b.count-a.count||a.index-b.index).slice(0,3);
+  if(deaths.length===0){const row=document.createElement('div');row.className='deathRow empty';row.textContent='まだ記録なし';deathList.appendChild(row)}
+  else deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
+  document.querySelector('#recordModal').classList.remove('hidden');
+}
+function showScores(){
+  const list=document.querySelector('#scoreList'),scores=getScores();list.innerHTML='';
+  if(scores.length===0){const row=document.createElement('div');row.className='scoreRow';row.innerHTML='<span class="scoreRank">-</span><span class="scoreValue">まだ記録なし</span>';list.appendChild(row)}
+  else scores.forEach((record,index)=>{const row=document.createElement('div');row.className='scoreRow';const rank=document.createElement('span');rank.className='scoreRank';rank.textContent=(index+1)+'.';const value=document.createElement('span');value.className='scoreValue';value.textContent=fmt(record.totalScore);row.append(rank,value);list.appendChild(row)});
+  document.querySelector('#scoreModal').classList.remove('hidden');
+}
+function fmt(value){return Math.floor(value).toLocaleString('ja-JP')}
 function itemChanceInterval(atDistance=dist){
   const range=GAME_CONFIG.itemChanceRanges.find(r=>atDistance>=r[0]&&atDistance<r[1])||GAME_CONFIG.itemChanceRanges[GAME_CONFIG.itemChanceRanges.length-1];
   return range[2]+Math.random()*(range[3]-range[2]);
@@ -974,12 +1036,10 @@ function loop(token,now=performance.now()){
 }
 loadDebugSettings();
 if(DEBUG_BUILD)document.querySelector('#debugBtn').classList.remove('hidden');
-reset();
 titleMode=true;
 run=false;
 document.body.classList.add('titleOnly');
 document.body.classList.remove('gameOnly');
-startTitleDemo();
 
 function closePauseRanking(){
   pauseRankingOpen=false;
@@ -1051,7 +1111,6 @@ function returnToTitle(){
   document.body.classList.remove('scoreModalOpen');
   document.body.classList.add('titleOnly');
   startBgm('title');
-  startTitleDemo();
 }
 function restartGame(){
   paused=false;pauseConfirmAction=null;pauseRankingOpen=false;
@@ -1085,7 +1144,6 @@ document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
   document.body.classList.remove('titleOnly');
   document.body.classList.add('gameOnly');
   titleMode=false;
-  stopTitleDemo();
   reset();
 });
 document.querySelector('#scoreBtn').addEventListener('pointerdown',e=>{
