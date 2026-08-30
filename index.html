@@ -37,6 +37,36 @@
     <button id="recordClose" type="button">戻る</button>
   </div>
 </div>
+<div id="helpModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div id="helpPanel">
+    <div id="helpHeader"><div id="helpTitle">遊び方</div><button id="helpClose" type="button" aria-label="遊び方を閉じる">×</button></div>
+    <div id="helpTabs" role="tablist" aria-label="遊び方の項目">
+      <button class="helpTab active" type="button" role="tab" data-help-tab="basic">基本操作</button><button class="helpTab" type="button" role="tab" data-help-tab="mosh">モッシュ</button><button class="helpTab" type="button" role="tab" data-help-tab="metal">メロスピ</button><button class="helpTab" type="button" role="tab" data-help-tab="items">アイテム</button><button class="helpTab" type="button" role="tab" data-help-tab="score">スコア</button>
+    </div>
+    <div id="helpCards">
+      <section class="helpCard active" data-help-page="basic">
+        <div class="helpVisual helpJumpVisual"><img src="assets/sakata.png" alt="坂田さんがジャンプするイメージ"><span class="helpAnimal">🐢</span><b>↑ ↑</b></div>
+        <div><h3>基本操作</h3><p>タップ／クリックでジャンプ<br>空中でも、もう一度で追加ジャンプ</p></div>
+      </section>
+      <section class="helpCard" data-help-page="mosh">
+        <div class="helpVisual helpMoshVisual"><img src="assets/sakata.png" alt="坂田モッシュのイメージ"><span>💥</span></div>
+        <div><h3>坂田モッシュ</h3><p>専用ボタン／PCは右クリック<br>危険な動物を倒せる</p></div>
+      </section>
+      <section class="helpCard helpMetalCard" data-help-page="metal">
+        <div class="helpVisual helpMetalVisual"><div class="metalSigns"><i>🤘</i><i>🤘</i><i>🤘</i><i>🤘</i><i>🤘</i></div><img src="assets/sakata.png" alt="坂田メロディックスピードメタルのイメージ"></div>
+        <div><h3>坂田メロディックスピードメタル</h3><p>🤘を5個集めると自動発動<br>大量撃破のボーナスタイム</p></div>
+      </section>
+      <section class="helpCard helpItemsCard" data-help-page="items">
+        <div class="helpVisual helpItemVisual"><span class="itemGuard">🛡</span><span class="itemDown">🐢</span><span class="itemUp">🐈</span><span class="itemHover">🚀</span></div>
+        <div><h3>アイテム</h3><p><b>GUARD</b>：1回だけミスを防ぐ　<b>SPEED DOWN</b>：減速<br><b>SPEED UP</b>：加速＋得点UP　<b>HOVER</b>：空中で長押し浮遊（計5秒）</p></div>
+      </section>
+      <section class="helpCard" data-help-page="score">
+        <div class="helpVisual helpScoreVisual"><span class="scorePig">🐷</span><b>+100</b><span class="scoreArrow">≫</span><em>×1.5</em></div>
+        <div><h3>スコア</h3><p>動物を突破／モッシュで撃破<br>速いほど得点アップ</p></div>
+      </section>
+    </div>
+  </div>
+</div>
 <div id="debugModal" class="hidden">
   <div id="debugPanel">
     <div id="debugTitle">DEBUG SETTINGS</div>

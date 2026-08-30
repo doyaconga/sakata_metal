@@ -1153,6 +1153,27 @@ document.querySelector('#scoreBtn').addEventListener('pointerdown',e=>{
   sfxButton();
   showScores();
 });
+document.querySelector('#helpBtn').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  initAudio();
+  sfxButton();
+  document.querySelector('#helpModal').classList.remove('hidden');
+});
+document.querySelector('#helpClose').addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  sfxButton();
+  document.querySelector('#helpModal').classList.add('hidden');
+});
+for(const tab of document.querySelectorAll('.helpTab'))tab.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  const page=tab.dataset.helpTab;
+  document.querySelectorAll('.helpTab').forEach(button=>button.classList.toggle('active',button===tab));
+  document.querySelectorAll('[data-help-page]').forEach(panel=>panel.classList.toggle('active',panel.dataset.helpPage===page));
+  sfxButton();
+});
 document.querySelector('#recordBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
