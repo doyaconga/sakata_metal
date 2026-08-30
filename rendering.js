@@ -8,6 +8,39 @@ function drawSakataSprite(ctx,size=76){
  }
 }
 
+// Shared item picture. The caller places the drawing origin at the item's
+// top-left, so this works on both the game canvas and tutorial canvases.
+function drawItemSprite(ctx,type){
+ if(type==='shield'){
+   ctx.translate(2,0);ctx.fillStyle='#d8dde6';ctx.strokeStyle='#38485c';ctx.lineWidth=3;
+   ctx.beginPath();ctx.moveTo(21,3);ctx.lineTo(39,10);ctx.lineTo(37,27);ctx.quadraticCurveTo(33,39,21,45);ctx.quadraticCurveTo(9,39,5,27);ctx.lineTo(3,10);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.fillStyle='#6e91b7';ctx.beginPath();ctx.moveTo(21,8);ctx.lineTo(33,13);ctx.lineTo(31,26);ctx.quadraticCurveTo(28,34,21,38);ctx.quadraticCurveTo(14,34,11,26);ctx.lineTo(9,13);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(21,9);ctx.lineTo(21,36);ctx.stroke();
+ }else if(type==='speedDown'||type==='speedUp'||type==='hover'){
+   const icon=type==='speedDown'?'🐢':(type==='speedUp'?'🐈':'🚀');
+   const glow=type==='speedDown'?'#8dff72':(type==='speedUp'?'#ffb347':'#72e6ff');
+   ctx.shadowColor=glow;ctx.shadowBlur=type==='hover'?14:12;ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(icon,23,36);ctx.shadowBlur=0;
+ }else if(type==='cyclonePiece'){
+   ctx.shadowColor='#77edff';ctx.shadowBlur=16;ctx.strokeStyle='#1c6674';ctx.fillStyle='#9af4ff';ctx.lineWidth=3;
+   ctx.beginPath();ctx.arc(23,23,18,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#185467';ctx.font='900 30px sans-serif';ctx.fillText('🤘',23,34);ctx.shadowBlur=0;
+ }else{
+   ctx.shadowColor='#ffe45c';ctx.shadowBlur=14;ctx.fillStyle='#ffe45c';ctx.strokeStyle='#7a4b00';ctx.lineWidth=3;
+   ctx.beginPath();ctx.moveTo(27,1);ctx.lineTo(9,25);ctx.lineTo(22,25);ctx.lineTo(15,46);ctx.lineTo(40,18);ctx.lineTo(27,18);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+ }
+}
+
+// The first tutorial animals share the exact live-game art and leg motion.
+function drawTutorialAnimalSprite(ctx,o){
+ const stride=o.age*.23;
+ if(o.type==='pig'){
+   ctx.strokeStyle='#8d4e5c';ctx.lineWidth=3;ctx.fillStyle='#ef9cab';ctx.beginPath();ctx.ellipse(o.w*.43,o.h*.61,o.w*.34,o.h*.27,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.arc(o.w*.75,o.h*.49,o.h*.25,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#dc7f91';ctx.beginPath();ctx.moveTo(o.w*.62,o.h*.31);ctx.lineTo(o.w*.65,o.h*.08);ctx.lineTo(o.w*.74,o.h*.30);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(o.w*.77,o.h*.28);ctx.lineTo(o.w*.85,o.h*.09);ctx.lineTo(o.w*.90,o.h*.34);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#f5b3be';ctx.beginPath();ctx.ellipse(o.w*.91,o.h*.55,o.w*.14,o.h*.11,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#8d4e5c';ctx.beginPath();ctx.arc(o.w*.87,o.h*.55,2.5,0,Math.PI*2);ctx.arc(o.w*.95,o.h*.55,2.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(o.w*.70,o.h*.42,4.5,0,Math.PI*2);ctx.arc(o.w*.80,o.h*.42,4.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#222';ctx.beginPath();ctx.arc(o.w*.71,o.h*.42,2.2,0,Math.PI*2);ctx.arc(o.w*.81,o.h*.42,2.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#b96575';const step=Math.sin(stride)*5;ctx.fillRect(o.w*.25+step,o.h*.78,9,o.h*.19);ctx.fillRect(o.w*.52-step,o.h*.78,9,o.h*.19);ctx.strokeStyle='#b96575';ctx.lineWidth=4;ctx.beginPath();ctx.arc(o.w*.09,o.h*.55,9,0,Math.PI*1.8);ctx.stroke();return true;
+ }
+ if(o.type==='turtle'){
+   ctx.strokeStyle='#57421d';ctx.lineWidth=3;ctx.fillStyle='#e0aa42';ctx.beginPath();ctx.ellipse(o.w*.46,o.h*.57,o.w*.34,o.h*.30,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#f2cb62';ctx.beginPath();ctx.ellipse(o.w*.46,o.h*.57,o.w*.25,o.h*.21,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#8f6d2c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(o.w*.28,o.h*.55);ctx.lineTo(o.w*.64,o.h*.55);ctx.moveTo(o.w*.37,o.h*.39);ctx.lineTo(o.w*.37,o.h*.72);ctx.moveTo(o.w*.55,o.h*.39);ctx.lineTo(o.w*.55,o.h*.72);ctx.stroke();ctx.fillStyle='#8fc85d';ctx.strokeStyle='#3f6a32';ctx.lineWidth=3;ctx.beginPath();ctx.arc(o.w*.82,o.h*.55,o.h*.20,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(o.w*.78,o.h*.49,4,0,Math.PI*2);ctx.arc(o.w*.88,o.h*.49,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(o.w*.79,o.h*.49,2,0,Math.PI*2);ctx.arc(o.w*.89,o.h*.49,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6ba64e';const step=Math.sin(stride*.55)*4;ctx.fillRect(o.w*.18+step,o.h*.78,11,5);ctx.fillRect(o.w*.57-step,o.h*.78,11,5);return true;
+ }
+ return false;
+}
+
 function drawScoreEffects(){
   for(const effect of scoreEffects){
     const age=effect.maxLife-effect.life;
@@ -227,25 +260,7 @@ function draw(){
    x.translate(it.x,it.y+Math.sin(it.bob)*4);
    x.font='900 12px sans-serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.75)';x.fillStyle='#fff';
    const label=it.type==='shield'?'🛡 GUARD':(it.type==='speedDown'?'🐢 SPEED DOWN':(it.type==='speedUp'?'🐈 SPEED UP':(it.type==='hover'?'🚀 HOVER':(it.type==='cyclonePiece'?'🤘 METAL':`⚡ CHARGE +${Math.round(GAME_CONFIG.chargeRecoveryRatio*100)}%`))));x.strokeText(label,23,-8);x.fillText(label,23,-8);
-   if(it.type==='shield'){
-     x.translate(2,0);x.fillStyle='#d8dde6';x.strokeStyle='#38485c';x.lineWidth=3;
-     x.beginPath();x.moveTo(21,3);x.lineTo(39,10);x.lineTo(37,27);x.quadraticCurveTo(33,39,21,45);x.quadraticCurveTo(9,39,5,27);x.lineTo(3,10);x.closePath();x.fill();x.stroke();
-     x.fillStyle='#6e91b7';x.beginPath();x.moveTo(21,8);x.lineTo(33,13);x.lineTo(31,26);x.quadraticCurveTo(28,34,21,38);x.quadraticCurveTo(14,34,11,26);x.lineTo(9,13);x.closePath();x.fill();
-     x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=3;x.beginPath();x.moveTo(21,9);x.lineTo(21,36);x.stroke();
-   }else if(it.type==='speedDown'){
-     x.shadowColor='#8dff72';x.shadowBlur=12;x.font='34px sans-serif';x.textAlign='center';x.fillStyle='#fff';x.fillText('🐢',23,36);x.shadowBlur=0;
-   }else if(it.type==='speedUp'){
-     x.shadowColor='#ffb347';x.shadowBlur=12;x.font='34px sans-serif';x.textAlign='center';x.fillStyle='#fff';x.fillText('🐈',23,36);x.shadowBlur=0;
-   }else if(it.type==='hover'){
-     x.shadowColor='#72e6ff';x.shadowBlur=14;x.font='34px sans-serif';x.textAlign='center';x.fillStyle='#fff';x.fillText('🚀',23,36);x.shadowBlur=0;
-   }else if(it.type==='cyclonePiece'){
-     x.shadowColor='#77edff';x.shadowBlur=16;x.strokeStyle='#1c6674';x.fillStyle='#9af4ff';x.lineWidth=3;
-     x.beginPath();x.arc(23,23,18,0,Math.PI*2);x.fill();x.stroke();
-     x.fillStyle='#185467';x.font='900 30px sans-serif';x.fillText('🤘',23,34);x.shadowBlur=0;
-   }else{
-     x.shadowColor='#ffe45c';x.shadowBlur=14;x.fillStyle='#ffe45c';x.strokeStyle='#7a4b00';x.lineWidth=3;
-     x.beginPath();x.moveTo(27,1);x.lineTo(9,25);x.lineTo(22,25);x.lineTo(15,46);x.lineTo(40,18);x.lineTo(27,18);x.closePath();x.fill();x.stroke();x.shadowBlur=0;
-   }
+   drawItemSprite(x,it.type);
    x.restore();
  }
 
@@ -285,7 +300,9 @@ function draw(){
     x.translate(o.w/2,o.h/2);x.rotate(cowTilt);x.translate(-o.w/2,-o.h/2);
   }
 
-  if(o.type==='pig'){
+  if(drawTutorialAnimalSprite(x,o)){
+    // Pig and turtle are rendered by the shared sprite component.
+  }else if(o.type==='pig'){
     // Chibi pig: pink round body, big snout, triangle ears and curly tail.
     x.strokeStyle='#8d4e5c';x.lineWidth=3;
     x.fillStyle='#ef9cab';
