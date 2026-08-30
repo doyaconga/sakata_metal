@@ -830,7 +830,16 @@ function update(){
    cycloneResultMusicDelay--;
    if(cycloneResultMusicDelay===0&&!titleMode&&run&&!paused)startBgm('game');
  }
- if(!cycloneActive)dist+=speed/12;
+ if(!cycloneActive){
+   const distanceStep=speed/12;
+   dist+=distanceStep;
+   // ITEM CHANCE is a detour, not normal road progress. Keep the remaining
+   // distance to METAL and CHARGE unchanged while the choice is on screen.
+   if(itemChanceActive){
+     nextCyclonePieceAt+=distanceStep;
+     nextChargeAt+=distanceStep;
+   }
+ }
  // Keep the background timeline continuous. Seasonal scenery handles its own
  // off-screen looping, so resetting this value would visibly teleport it.
  groundOffset+=speed;
