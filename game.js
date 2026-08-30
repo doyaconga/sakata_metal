@@ -705,6 +705,11 @@ function update(){
    return;
  }
  if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&spawnTimer<=0)spawnPattern();
+ // The world scroll and animal actions share this scale. Without it, a fast
+ // scroll lets moving hazards (especially the rabbit) pass before acting.
+ // Use the normal gameplay baseline (speed 6), not the configurable starting
+ // speed. In debug, starting directly at speed 10 must still accelerate animal
+ // actions to 10 / 6 times their normal rate.
  const timeScale=Math.max(1,speed/6);
  hoverActive=hoverFuelFrames>0&&hoverHeld&&!p.on&&p.vy>=-1;
  if(hoverActive){
@@ -761,7 +766,7 @@ function update(){
  }
 
  for(const o of obs){
-  const simScale=Math.max(1,speed/6);
+  const simScale=timeScale;
   o.age+=simScale;
 
   if(o.flying){
@@ -783,7 +788,7 @@ function update(){
   }else if(o.type==='dog'){
     // Real patrol: dog runs toward the player, turns around, runs away, then returns.
     // The whole course still scrolls left, but the dog has its own signed movement.
-    const dogSpeed=2.4;
+    const dogSpeed=2.4*timeScale;
     o.x-=speed;              // world scroll
     o.x+=o.dogDir*dogSpeed;  // dog's own run
     if(o.dogDir<0 && o.x<=o.dogTurnLeft){
@@ -843,14 +848,14 @@ function update(){
     o.y=G-o.h;
     o.rearLift=lift;
   }else if(o.move==='react'){
-    // Rabbit jumps once when the player enters its reaction distance.
+    // Keep the familiar reaction distance; only the jump itself speeds up.
     if(!o.reacted && o.x-p.x < o.trigger && o.x>p.x){
       o.reacted=true;
       o.localVy=o.jumpV;
     }
     if(o.reacted){
-      o.localVy+=0.62;
-      o.y=(o.y??(G-o.h))+o.localVy;
+      o.localVy+=0.62*timeScale;
+      o.y=(o.y??(G-o.h))+o.localVy*timeScale;
       if(o.y+o.h>=G){
         o.y=G-o.h;
         o.localVy=0;
@@ -900,9 +905,9 @@ function update(){
  obs=obs.filter(o=>o.x+o.w>-80 && (!o.flying || (o.y??0)<H+120));
  for(const peel of bananaPeels){
    if(!peel.landed){
-     peel.x+=peel.throwVx-speed;
-     peel.y+=peel.vy;
-     peel.vy+=.58;
+     peel.x+=peel.throwVx*timeScale-speed;
+     peel.y+=peel.vy*timeScale;
+     peel.vy+=.58*timeScale;
      if(peel.y>=G-10){peel.y=G-10;peel.landed=true;peel.vy=0}
    }else peel.x-=speed;
    peel.life--;
@@ -915,8 +920,8 @@ function update(){
  for(const dropping of crowDroppings){
    dropping.x-=speed;
    if(!dropping.landed){
-     dropping.y+=dropping.vy;
-     dropping.vy+=.55;
+     dropping.y+=dropping.vy*timeScale;
+     dropping.vy+=.55*timeScale;
      if(dropping.y>=G-9){dropping.y=G-9;dropping.landed=true;dropping.vy=0}
    }
    dropping.life--;
