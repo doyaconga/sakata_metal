@@ -472,7 +472,7 @@ function spawnPattern(){
  const compound=[
   // Clear the cow with one jump and land to run under the bats. A needless
   // second jump keeps the player airborne long enough to collide with them.
-  [{d:0,t:'cow',w:115,h:107},{d:200,t:'bats',w:175,h:58,y:G-210,move:'bob',amp:8,period:78}],
+  [{d:0,t:'cow',w:115,h:107},{d:260,t:'bats',w:175,h:58,y:G-210,move:'bob',amp:8,period:78}],
   // Turtle into low birds: two readable jumps with a full landing window.
   [{d:0,t:'turtle',w:58,h:34},{d:370,t:'birds',w:175,h:42,y:G-72}],
   // Pig into hopping frog: the wide gap preserves a reaction window even
@@ -539,7 +539,7 @@ function spawnPattern(){
      jumpV:q.jumpV||0,
      reacted:false,
      localVy:0,
-     speedMul:q.t==='turtle'?0.82:(q.t==='pig'?1.02:(q.t==='cat'?GAME_CONFIG.catSpeedMultiplier:1)),
+    speedMul:q.t==='turtle'?0.82:(q.t==='cow'?0.92:(q.t==='pig'?1.02:(q.t==='cat'?GAME_CONFIG.catSpeedMultiplier:1))),
      patrolAmp:q.t==='dog'?42:0,
      patrolPeriod:q.t==='dog'?115:1,
      dogDir:q.t==='dog'?-1:0,
