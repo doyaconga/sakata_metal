@@ -132,7 +132,7 @@ function showPlayRecords(){
   document.querySelector('#recordModal').classList.remove('hidden');
 }
 let collectionPreviewRaf=null,collectionPreviewFrame=0,collectionPreviewLast=0,collectionPreviewType=null;
-const COLLECTION_ANIMAL_INFO={pig:'基本の動物。地面をまっすぐ進む',turtle:'ゆっくり地面を進む',frog:'大きくジャンプする',birds:'低い位置を群れで飛ぶ',cow:'大きな体で道をふさぐ',cat:'すばやく走り込んでくる',snake:'頭を持ち上げて前へ伸びる',bats:'高い位置を群れで飛ぶ',rabbit:'近づくとジャンプする',dog:'通過後に戻ってくる',monkey:'通過後にバナナを投げる',crow:'高い場所からフンを落とす'};
+const COLLECTION_ANIMAL_INFO={pig:'地面をまっすぐ進む',turtle:'ゆっくり地面を進む',frog:'大きくジャンプする',birds:'低い位置を群れで飛ぶ',cow:'大きな体で道をふさぐ',cat:'すばやく走り込んでくる',snake:'前に向かって伸びてくる',bats:'高い位置を群れで飛ぶ',rabbit:'近づくとジャンプする',dog:'通過後に戻ってくる',monkey:'バナナの皮を投げ捨てる',crow:'高い場所からフンを落とす'};
 function collectionPreviewLength(type){return type==='turtle'?320:((type==='birds'||type==='bats')?220:200)}
 function collectionPreviewObject(type,frame,playing=false){
   const sizes={pig:[64,48],turtle:[58,34],frog:[46,36],dog:[58,42],cat:[52,40],birds:[175,42],bats:[175,58],snake:[100,42],rabbit:[44,38],cow:[115,107],monkey:[60,54],crow:[68,42]};
