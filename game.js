@@ -356,12 +356,16 @@ function updateScoreEffects(){
 c.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right press activates Sakata Mosh immediately.
   e.preventDefault();
+  if(e.pointerType==='touch')c.setPointerCapture(e.pointerId);
   if(e.button===2){useLariat();return;}
   hoverHeld=true;
   jump();
 });
-c.addEventListener('pointerup',()=>{hoverHeld=false});
-c.addEventListener('pointercancel',()=>{hoverHeld=false});
+c.addEventListener('pointerup',e=>{hoverHeld=false;if(c.hasPointerCapture(e.pointerId))c.releasePointerCapture(e.pointerId)});
+c.addEventListener('pointercancel',e=>{hoverHeld=false;if(c.hasPointerCapture(e.pointerId))c.releasePointerCapture(e.pointerId)});
+c.addEventListener('selectstart',e=>e.preventDefault());
+c.addEventListener('dragstart',e=>e.preventDefault());
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 window.addEventListener('pointerup',()=>{hoverHeld=false});
 window.addEventListener('blur',()=>{hoverHeld=false});
 c.addEventListener('contextmenu',e=>{
