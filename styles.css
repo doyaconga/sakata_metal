@@ -97,6 +97,7 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 #helpPanel canvas.helpDemo{display:block;width:min(100%,380px);height:auto;aspect-ratio:480 / 280;margin-inline:auto;object-fit:contain}
 .helpItemsCard{display:none}.helpItemsCard.active{display:block;padding:22px 34px}.helpItemList{max-width:720px;margin:0 auto}.helpItemList h3{text-align:center}.helpItemList>div{display:grid;grid-template-columns:220px 1fr;align-items:center;min-height:45px;padding:6px 10px;border-bottom:1px solid #cdbfae;font-size:17px;font-weight:800}.helpItemList span{font-weight:1000;color:#742020}
 .helpAboutCard.active{display:flex;align-items:center;justify-content:center;gap:28px;background:linear-gradient(145deg,#2d526b,#111b2a)}.helpAboutSakata{width:min(34%,255px);height:auto;object-fit:contain;filter:drop-shadow(6px 8px 0 rgba(0,0,0,.42))}.helpAboutText{max-width:520px;color:#fff;text-align:center;font-size:23px;font-weight:1000;line-height:1.7;text-shadow:2px 2px #000}.helpAboutText p{margin:0 0 20px}.helpAboutText p:nth-child(3){color:#ffe45c}.helpAboutText p:last-child{color:#ffb2a7}
+.mobileBreak{display:none}
 
 
 #gameShell{width:100%;height:100%}
@@ -191,7 +192,7 @@ body.titleOnly #scoreModal:not(.hidden){
 @media(max-width:620px){#cycloneCutin{height:145px;gap:15px}#cycloneCutin img{width:110px;height:110px}#cycloneCutin span{font-size:23px}#cycloneCutin strong{font-size:34px}#cycloneCountdown{font-size:105px}}
 @media(max-width:620px){#helpPanel{padding:14px 12px 18px}#helpTitle{font-size:25px}#helpCards{grid-template-columns:1fr;gap:8px}.helpCard,.helpMetalCard,.helpItemsCard{grid-column:auto;min-height:0;gap:12px;padding:12px}.helpVisual{width:100%;height:auto}.helpVisual img{width:53px;height:53px}.helpCard h3{font-size:20px;margin-bottom:5px}.helpCard p{font-size:16px;line-height:1.55}.helpJumpVisual img{left:17px;bottom:9px}.helpJumpVisual .helpAnimal{right:6px;bottom:5px;font-size:25px}.helpJumpVisual b{left:29px;top:3px;font-size:18px}.helpMoshVisual img,.helpMetalVisual img{left:26px;top:19px}.metalSigns{inset:4px}.metalSigns i{font-size:15px}.helpItemVisual span{width:36px;height:36px;font-size:21px}.scorePig{font-size:31px}.helpScoreVisual b{left:43px;top:17px;font-size:18px}.scoreArrow{font-size:22px}.helpScoreVisual em{font-size:10px}}
 @media(max-width:620px){#helpTabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding-bottom:3px}.helpTab{min-width:0;padding:4px 1px;font-size:11px}.helpCard.active:not(.helpAboutCard):not(.helpItemsCard)>.helpDemo{width:100%;height:auto}.helpItemsCard.active{padding:8px}.helpItemList>div{grid-template-columns:145px 1fr;min-height:36px;padding:4px;font-size:13px}.helpItemList h3{font-size:20px}.helpItemList span{font-size:13px}}
-@media(max-width:620px){.helpAboutCard.active{gap:8px}.helpAboutSakata{width:31%;max-width:145px}.helpAboutText{padding:6px;font-size:16px;line-height:1.5}.helpAboutText p{margin-bottom:12px}}
+@media(max-width:620px){.helpAboutCard.active{gap:8px}.helpAboutSakata{width:31%;max-width:145px}.helpAboutText{padding:6px;font-size:16px;line-height:1.5}.helpAboutText p{margin-bottom:12px}.desktopBreak{display:none}.mobileBreak{display:inline}}
 
 
 #titleScreen{
