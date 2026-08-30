@@ -2,7 +2,23 @@ const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
 // The title screen is the initial scene. This used to live in the removed
 // title-demo script, but the game itself also relies on it for screen changes.
 let titleMode=true;
+let debugModeEnabled=false;
+const KONAMI_COMMAND=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+let konamiCommandIndex=0;
 const sakataImg=new Image();sakataImg.src='assets/sakata.png';
+function updateDebugSub(){
+  const sub=document.querySelector('#sub');
+  sub.innerHTML=debugModeEnabled?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM NEXT ${fmt(nextItemChanceAt)}m</span>`:'';
+}
+function setDebugMode(enabled){
+  debugModeEnabled=enabled;
+  document.querySelector('#debugBtn').classList.toggle('hidden',!enabled);
+  if(!enabled){
+    document.querySelector('#debugModal').classList.add('hidden');
+    debugHitboxes=false;
+  }
+  if(typeof stage==='number')updateDebugSub();
+}
 function renderDebugSettings(){
   const fields=document.querySelector('#debugFields');fields.innerHTML='';
   for(const def of DEBUG_SETTING_DEFS){
@@ -455,7 +471,7 @@ function reset(){
  document.querySelector('#banner').classList.remove('show');
  document.querySelector('#scoreValue').textContent='0';
  document.querySelector('#scoreGain').replaceChildren();
- document.querySelector('#sub').innerHTML=DEBUG_BUILD?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM NEXT ${fmt(nextItemChanceAt)}m</span>`:'';
+ updateDebugSub();
  updateItemHud();
  const lb=document.querySelector('#lariatBtn');
  lb.disabled=false;
@@ -1170,7 +1186,19 @@ function loop(token,now=performance.now()){
  }
 }
 loadDebugSettings();
-if(DEBUG_BUILD)document.querySelector('#debugBtn').classList.remove('hidden');
+setDebugMode(false);
+window.addEventListener('keydown',e=>{
+  if(e.repeat)return;
+  const expected=KONAMI_COMMAND[konamiCommandIndex];
+  if(e.code===expected){
+    if(e.code.startsWith('Arrow'))e.preventDefault();
+    konamiCommandIndex++;
+    if(konamiCommandIndex===KONAMI_COMMAND.length){
+      setDebugMode(!debugModeEnabled);
+      konamiCommandIndex=0;
+    }
+  }else konamiCommandIndex=e.code===KONAMI_COMMAND[0]?1:0;
+});
 titleMode=true;
 run=false;
 document.body.classList.add('titleOnly');
@@ -1262,7 +1290,7 @@ function restartGame(){
 document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
-  if(DEBUG_BUILD&&!commitDebugInputs(false)){
+  if(DEBUG_BUILD&&debugModeEnabled&&!commitDebugInputs(false)){
     renderDebugSettings();
     setDebugStatus('ゲームを開始するには、出現する動物を1匹以上選択してください。',true);
     document.querySelector('#debugModal').classList.remove('hidden');
@@ -1468,7 +1496,7 @@ document.addEventListener('keydown',e=>{
     if(paused){sfxButton();resumeFromPause();return;}
     if(run&&!titleMode){sfxButton();openPause();return;}
   }
-  if(e.code!=='KeyD' || e.repeat)return;
+  if(!debugModeEnabled||e.code!=='KeyD' || e.repeat)return;
   debugHitboxes=!debugHitboxes;
   if(!run)draw();
 });

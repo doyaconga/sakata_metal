@@ -704,7 +704,7 @@ function draw(){
      node=document.createElement('span');node.className='scoreGainNotice';node.dataset.noticeId=String(notice.id);node.textContent=`+${fmt(notice.points)}`;scoreGain.appendChild(node);
    }
  });
- const debugItemLine=DEBUG_BUILD?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM ${itemChanceActive?'ACTIVE':(itemChancePending?'PREP ': 'NEXT ')+(itemChancePending?fmt(nextItemChanceAt):fmt(Math.max(dist,nextItemChanceAt)))+'m'}</span>`:'';
+ const debugItemLine=DEBUG_BUILD&&debugModeEnabled?`<span style="color:#9ff7ff">DEBUG STAGE ${stage} / SPEED ${speed.toFixed(2)}</span><br><span style="color:#ffe45c">DEBUG ITEM ${itemChanceActive?'ACTIVE':(itemChancePending?'PREP ': 'NEXT ')+(itemChancePending?fmt(nextItemChanceAt):fmt(Math.max(dist,nextItemChanceAt)))+'m'}</span>`:'';
  document.querySelector('#sub').innerHTML=debugItemLine;
  x.restore();
 }
