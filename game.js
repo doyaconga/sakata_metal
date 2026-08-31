@@ -1,4 +1,17 @@
 const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
+let canvasRenderScale=1;
+function gameDisplayWidth(){return Math.min(1920,window.innerWidth,window.innerHeight*16/9)}
+function updateCanvasRenderResolution(){
+  // Keep game logic in the familiar 960 x 540 coordinate system, while using
+  // a larger backing canvas when the PC display is larger.
+  const nextScale=Math.min(2,Math.max(1,gameDisplayWidth()/W));
+  const nextWidth=Math.round(W*nextScale),nextHeight=Math.round(H*nextScale);
+  if(c.width===nextWidth&&c.height===nextHeight){canvasRenderScale=nextScale;return}
+  c.width=nextWidth;c.height=nextHeight;
+  canvasRenderScale=nextScale;
+  x.imageSmoothingEnabled=true;
+  if('imageSmoothingQuality' in x)x.imageSmoothingQuality='high';
+}
 function updateDesktopUiScale(){
   const ui=document.querySelector('#ui');
   // Phones keep their dedicated compact layout. On PC, the canvas and the UI
@@ -7,7 +20,7 @@ function updateDesktopUiScale(){
     ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
     return;
   }
-  const gameWidth=Math.min(1920,window.innerWidth,window.innerHeight*16/9);
+  const gameWidth=gameDisplayWidth();
   const scale=Math.max(1,gameWidth/W);
   if(scale<=1.01){
     ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
@@ -18,8 +31,9 @@ function updateDesktopUiScale(){
   ui.style.transform=`scale(${scale})`;
   ui.style.transformOrigin='top left';
 }
+updateCanvasRenderResolution();
 updateDesktopUiScale();
-window.addEventListener('resize',updateDesktopUiScale);
+window.addEventListener('resize',()=>{updateCanvasRenderResolution();updateDesktopUiScale()});
 // The title screen is the initial scene. This used to live in the removed
 // title-demo script, but the game itself also relies on it for screen changes.
 let titleMode=true;
@@ -202,7 +216,7 @@ function drawCollectionPreview(canvas,type,frame,playing=false){
   draw();
   const ctx=canvas.getContext('2d'),sourceY=type==='crow'?10:(type==='bats'?G-300:G-205);
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(c,330,sourceY,300,225,0,0,canvas.width,canvas.height);
+  ctx.drawImage(c,330*canvasRenderScale,sourceY*canvasRenderScale,300*canvasRenderScale,225*canvasRenderScale,0,0,canvas.width,canvas.height);
   obs=saved.obs;items=saved.items;bananaPeels=saved.bananaPeels;crowDroppings=saved.crowDroppings;scoreEffects=saved.scoreEffects;
 }
 function animateCollectionPreviews(now){

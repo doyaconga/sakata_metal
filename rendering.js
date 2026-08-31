@@ -163,6 +163,7 @@ function drawCycloneRainbowSky(){
   x.restore();
 }
 function draw(){
+ x.setTransform(canvasRenderScale,0,0,canvasRenderScale,0,0);
  x.save();
  const cycloneVisual=cycloneState==='active';
  const lariatPower=lariatTimer>GAME_CONFIG.lariatWarningFrames?1:(lariatTimer>0?Math.max(.05,lariatTimer/GAME_CONFIG.lariatWarningFrames):0);
