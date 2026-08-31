@@ -9,7 +9,14 @@
 <div id="titleScreen">
   <div id="titleContent">
     <div id="gameTitle">坂田さんの<br>メロディックスピードメタル</div>
-    <img id="titleSakata" src="assets/sakata-front.png" alt="表情を変える坂田さん" role="button" tabindex="0" aria-label="クリックすると坂田さんの表情が変わります">
+    <div id="titleSakata" role="button" tabindex="0" aria-label="クリックすると坂田さんの表情が変わります">
+      <img class="titleSakataFace active" src="assets/sakata-front.png" alt="">
+      <img class="titleSakataFace" src="assets/sakata-face-neutral.png" alt="" style="--title-sakata-scale:.94">
+      <img class="titleSakataFace" src="assets/sakata-face-smirk.png" alt="" style="--title-sakata-scale:.91">
+      <img class="titleSakataFace" src="assets/sakata-face-shout.png" alt="" style="--title-sakata-scale:.97">
+      <img class="titleSakataFace" src="assets/sakata-face-surprised.png" alt="" style="--title-sakata-scale:.99">
+      <img class="titleSakataFace" src="assets/sakata-face-teary.png" alt="" style="--title-sakata-scale:.98">
+    </div>
     <div id="titleButtons">
       <button id="startBtn" type="button">スタート</button>
       <button id="helpBtn" type="button">遊び方</button>

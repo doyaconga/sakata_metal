@@ -1287,20 +1287,15 @@ function restartGame(){
 }
 
 const TITLE_SAKATA_FACES=[
-  {src:'assets/sakata-face-neutral.png',scale:.9},
-  {src:'assets/sakata-face-smirk.png',scale:.9},
-  {src:'assets/sakata-face-shout.png',scale:1},
-  {src:'assets/sakata-face-surprised.png',scale:1},
-  {src:'assets/sakata-face-teary.png',scale:1}
+  1,2,3,4,5
 ];
 let titleSakataFaceIndex=-1;
 function changeTitleSakataFace(){
   let nextIndex=titleSakataFaceIndex;
   while(nextIndex===titleSakataFaceIndex)nextIndex=Math.floor(Math.random()*TITLE_SAKATA_FACES.length);
   titleSakataFaceIndex=nextIndex;
-  const face=TITLE_SAKATA_FACES[nextIndex],image=document.querySelector('#titleSakata');
-  image.src=face.src;
-  image.style.setProperty('--title-sakata-scale',face.scale);
+  const faces=document.querySelectorAll('#titleSakata .titleSakataFace');
+  faces.forEach((face,index)=>face.classList.toggle('active',index===TITLE_SAKATA_FACES[nextIndex]));
 }
 const titleSakata=document.querySelector('#titleSakata');
 titleSakata.addEventListener('pointerdown',e=>{
