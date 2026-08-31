@@ -142,9 +142,8 @@ function showPlayRecords(){
   for(const row of rows)for(const text of row){const cell=document.createElement('span');cell.textContent=text;table.appendChild(cell)}
   const deathList=document.querySelector('#deathList');deathList.replaceChildren();
   const names=Object.fromEntries(ANIMAL_OPTIONS);
-  const deaths=ANIMAL_TYPES.map((type,index)=>({type,index,count:stats.deaths[type]||0})).filter(item=>item.count>0).sort((a,b)=>b.count-a.count||a.index-b.index).slice(0,3);
-  if(deaths.length===0){const row=document.createElement('div');row.className='deathRow empty';row.textContent='まだ記録なし';deathList.appendChild(row)}
-  else deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
+  const deaths=ANIMAL_TYPES.map((type,index)=>({type,index,count:stats.deaths[type]||0})).sort((a,b)=>b.count-a.count||a.index-b.index);
+  deaths.forEach((item,index)=>{const row=document.createElement('div');row.className='deathRow';const rank=document.createElement('span');rank.textContent=`${index+1}. ${names[item.type]||item.type}`;const count=document.createElement('span');count.textContent=`${fmt(item.count)}回`;row.append(rank,count);deathList.appendChild(row)});
   document.querySelector('#recordModal').classList.remove('hidden');
 }
 let collectionPreviewRaf=null,collectionPreviewFrame=0,collectionPreviewLast=0,collectionPreviewType=null;
