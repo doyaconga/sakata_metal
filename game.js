@@ -1,4 +1,25 @@
 const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
+function updateDesktopUiScale(){
+  const ui=document.querySelector('#ui');
+  // Phones keep their dedicated compact layout. On PC, the canvas and the UI
+  // grow together according to the current browser window, not only F11 mode.
+  if(window.matchMedia('(max-width:620px)').matches){
+    ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
+    return;
+  }
+  const gameWidth=Math.min(1920,window.innerWidth,window.innerHeight*16/9);
+  const scale=Math.max(1,gameWidth/W);
+  if(scale<=1.01){
+    ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
+    return;
+  }
+  ui.style.width=`${100/scale}%`;
+  ui.style.height=`${100/scale}%`;
+  ui.style.transform=`scale(${scale})`;
+  ui.style.transformOrigin='top left';
+}
+updateDesktopUiScale();
+window.addEventListener('resize',updateDesktopUiScale);
 // The title screen is the initial scene. This used to live in the removed
 // title-demo script, but the game itself also relies on it for screen changes.
 let titleMode=true;

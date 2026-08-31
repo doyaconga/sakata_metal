@@ -327,8 +327,8 @@ body{
 #titleScreen{
   position:relative;
   inset:auto;
-  width:min(960px,100vw);
-  height:min(540px,100vh);
+  width:min(1920px,100vw,177.777777vh);
+  height:auto;
   aspect-ratio:960/540;
   z-index:1000;
   display:flex;
@@ -339,8 +339,8 @@ body{
 }
 #gameShell{
   position:relative;
-  width:min(960px,100vw);
-  height:min(540px,100vh);
+  width:min(1920px,100vw,177.777777vh);
+  height:auto;
   aspect-ratio:960/540;
   overflow:hidden;
   margin:auto;
