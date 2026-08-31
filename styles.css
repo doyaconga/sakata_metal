@@ -339,6 +339,22 @@ body.touchLayout #score{left:10px;top:9px;gap:5px;font-size:clamp(13px,4.4vw,16p
 body.touchLayout #scoreLabel{font-size:0}body.touchLayout #scoreLabel::after{content:'SCORE';font-size:clamp(13px,4.4vw,16px)}
 body.touchLayout #scoreGain{flex-basis:48px;width:48px;height:17px;font-size:13px}
 body.touchLayout #pauseBtn{right:10px;top:9px;width:42px;height:38px;font-size:19px}
+@media (orientation:portrait){
+  body.touchLayout #titleContent{padding:6px 10px;gap:6px}
+  body.touchLayout #titleSakata{flex:0 0 clamp(72px,14vh,96px);height:clamp(72px,14vh,96px);width:46vw}
+  body.touchLayout #titleContent #gameTitle{font-size:18px;line-height:1.08}
+  body.touchLayout #titleButtons{gap:7px}
+  body.touchLayout #startBtn,body.touchLayout #helpBtn,body.touchLayout #scoreBtn,body.touchLayout #recordBtn,body.touchLayout #collectionBtn{min-height:34px;padding:5px 4px;font-size:13px}
+  body.touchLayout #startBtn{min-height:38px;font-size:16px}
+  body.touchLayout #panel{width:min(360px,calc(100% - 20px));min-height:0;padding:14px 18px;border-radius:12px}
+  body.touchLayout #gameOverContent .gameOverTitle{font-size:24px;margin-bottom:5px}
+  body.touchLayout #gameOverContent .gameOverTotalLabel{font-size:14px}
+  body.touchLayout #gameOverContent .gameOverTotal{font-size:36px;margin:1px 0 7px}
+  body.touchLayout #gameOverContent .gameOverStats{column-gap:9px;row-gap:5px;font-size:13px}
+  body.touchLayout #gameOverMainButtons{gap:8px;margin:12px 0}
+  body.touchLayout #retryBtn,body.touchLayout #gameOverScoreBtn{width:calc(50% - 4px);padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px}
+  body.touchLayout #titleReturnBtn{width:100%;padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px}
+}
 
 
 html,body{
