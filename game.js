@@ -18,7 +18,7 @@ function updateDesktopUiScale(){
   const ui=document.querySelector('#ui');
   // Phones keep their dedicated compact layout. On PC, the canvas and the UI
   // grow together according to the current browser window, not only F11 mode.
-  if(window.matchMedia('(max-width:620px)').matches){
+  if(window.matchMedia('(max-width:620px), (pointer:coarse)').matches){
     ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
     return;
   }

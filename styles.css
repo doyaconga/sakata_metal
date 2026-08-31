@@ -196,11 +196,11 @@ body.titleOnly #scoreModal:not(.hidden){
 #pauseConfirmText{min-height:52px;font-size:17px;font-weight:900;line-height:1.55}
 #pauseConfirmButtons{display:flex;justify-content:center;gap:12px;margin-top:35px}
 #pauseConfirmButtons button{width:180px}
-@media(max-width:620px){#score{left:10px;top:9px;gap:5px;font-size:clamp(13px,4.4vw,16px)}#scoreLabel{font-size:0}#scoreLabel::after{content:'SCORE';font-size:clamp(13px,4.4vw,16px)}#scoreValue{flex-basis:9ch;width:9ch}#scoreGain{flex-basis:48px;width:48px;height:17px;font-size:13px}#sub{left:10px;top:36px;font-size:11px}#pauseBtn{right:10px;top:9px;width:42px;height:38px;font-size:19px}#cycloneMeter{left:10px;bottom:9px}#cycloneSlots{gap:4px}.cycloneSlot{width:31px;height:31px;font-size:20px}#pausePanel{min-height:360px;padding:25px 20px}#pauseTitle{margin-bottom:30px}#pauseButtons{gap:22px 9px}#pauseButtons button{padding:10px 7px;font-size:13px}#pauseConfirmButtons button{width:145px;font-size:14px}}
-@media(max-width:620px){#cycloneCutin{height:145px;gap:15px}#cycloneCutin img{width:110px;height:110px}#cycloneCutin span{font-size:23px}#cycloneCutin strong{font-size:34px}#cycloneCountdown{font-size:105px}}
-@media(max-width:620px){#helpPanel{padding:14px 12px 18px}#helpTitle{font-size:25px}#helpCards{grid-template-columns:1fr;gap:8px}.helpCard,.helpMetalCard,.helpItemsCard{grid-column:auto;min-height:0;gap:12px;padding:12px}.helpVisual{width:100%;height:auto}.helpVisual img{width:53px;height:53px}.helpCard h3{font-size:20px;margin-bottom:5px}.helpCard p{font-size:16px;line-height:1.55}.helpJumpVisual img{left:17px;bottom:9px}.helpJumpVisual .helpAnimal{right:6px;bottom:5px;font-size:25px}.helpJumpVisual b{left:29px;top:3px;font-size:18px}.helpMoshVisual img,.helpMetalVisual img{left:26px;top:19px}.metalSigns{inset:4px}.metalSigns i{font-size:15px}.helpItemVisual span{width:36px;height:36px;font-size:21px}.scorePig{font-size:31px}.helpScoreVisual b{left:43px;top:17px;font-size:18px}.scoreArrow{font-size:22px}.helpScoreVisual em{font-size:10px}}
-@media(max-width:620px){#helpTabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding-bottom:3px}.helpTab{min-width:0;padding:4px 1px;font-size:11px}.helpCard.active:not(.helpAboutCard):not(.helpItemsCard)>.helpDemo{width:100%;height:auto}.helpItemsCard.active{padding:8px}.helpItemList>div{grid-template-columns:145px 1fr;min-height:36px;padding:4px;font-size:13px}.helpItemList h3{font-size:20px}.helpItemList span{font-size:13px}}
-@media(max-width:620px){.helpAboutCard.active{gap:8px}.helpAboutSakata{width:31%;max-width:145px}.helpAboutText{padding:6px;font-size:16px;line-height:1.5}.helpAboutText p{margin-bottom:12px}.desktopBreak{display:none}.mobileBreak{display:inline}}
+@media(max-width:620px),(pointer:coarse){#score{left:10px;top:9px;gap:5px;font-size:clamp(13px,4.4vw,16px)}#scoreLabel{font-size:0}#scoreLabel::after{content:'SCORE';font-size:clamp(13px,4.4vw,16px)}#scoreValue{flex-basis:9ch;width:9ch}#scoreGain{flex-basis:48px;width:48px;height:17px;font-size:13px}#sub{left:10px;top:36px;font-size:11px}#pauseBtn{right:10px;top:9px;width:42px;height:38px;font-size:19px}#cycloneMeter{left:10px;bottom:9px}#cycloneSlots{gap:4px}.cycloneSlot{width:31px;height:31px;font-size:20px}#pausePanel{min-height:360px;padding:25px 20px}#pauseTitle{margin-bottom:30px}#pauseButtons{gap:22px 9px}#pauseButtons button{padding:10px 7px;font-size:13px}#pauseConfirmButtons button{width:145px;font-size:14px}}
+@media(max-width:620px),(pointer:coarse){#cycloneCutin{height:145px;gap:15px}#cycloneCutin img{width:110px;height:110px}#cycloneCutin span{font-size:23px}#cycloneCutin strong{font-size:34px}#cycloneCountdown{font-size:105px}}
+@media(max-width:620px),(pointer:coarse){#helpPanel{padding:14px 12px 18px}#helpTitle{font-size:25px}#helpCards{grid-template-columns:1fr;gap:8px}.helpCard,.helpMetalCard,.helpItemsCard{grid-column:auto;min-height:0;gap:12px;padding:12px}.helpVisual{width:100%;height:auto}.helpVisual img{width:53px;height:53px}.helpCard h3{font-size:20px;margin-bottom:5px}.helpCard p{font-size:16px;line-height:1.55}.helpJumpVisual img{left:17px;bottom:9px}.helpJumpVisual .helpAnimal{right:6px;bottom:5px;font-size:25px}.helpJumpVisual b{left:29px;top:3px;font-size:18px}.helpMoshVisual img,.helpMetalVisual img{left:26px;top:19px}.metalSigns{inset:4px}.metalSigns i{font-size:15px}.helpItemVisual span{width:36px;height:36px;font-size:21px}.scorePig{font-size:31px}.helpScoreVisual b{left:43px;top:17px;font-size:18px}.scoreArrow{font-size:22px}.helpScoreVisual em{font-size:10px}}
+@media(max-width:620px),(pointer:coarse){#helpTabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding-bottom:3px}.helpTab{min-width:0;padding:4px 1px;font-size:11px}.helpCard.active:not(.helpAboutCard):not(.helpItemsCard)>.helpDemo{width:100%;height:auto}.helpItemsCard.active{padding:8px}.helpItemList>div{grid-template-columns:145px 1fr;min-height:36px;padding:4px;font-size:13px}.helpItemList h3{font-size:20px}.helpItemList span{font-size:13px}}
+@media(max-width:620px),(pointer:coarse){.helpAboutCard.active{gap:8px}.helpAboutSakata{width:31%;max-width:145px}.helpAboutText{padding:6px;font-size:16px;line-height:1.5}.helpAboutText p{margin-bottom:12px}.desktopBreak{display:none}.mobileBreak{display:inline}}
 
 
 #titleScreen{
@@ -301,7 +301,7 @@ body.titleOnly #scoreModal:not(.hidden){
 #titleSakata:focus-visible{outline:3px solid #742020;outline-offset:4px;border-radius:8px}
 #titleContent #gameTitle{margin:0;color:#742020;font-size:clamp(24px,4vw,36px)}
 #titleContent #titleButtons{width:min(520px,100%);margin:0}
-@media (min-width:621px){
+@media (min-width:621px) and (pointer:fine){
   #titleContent{padding:clamp(28px,4vh,54px) clamp(28px,5vw,84px);gap:clamp(18px,2.5vh,28px)}
   #titleSakata{width:min(58vw,650px);height:clamp(175px,36vh,360px)}
   #titleContent #gameTitle{font-size:clamp(30px,4.2vw,64px);line-height:1.08}
@@ -319,8 +319,8 @@ body.titleOnly #scoreModal:not(.hidden){
   #pausePanel{width:min(700px,78vw);min-height:500px;padding:40px 44px}
   #pauseTitle{font-size:40px}#pauseButtons button,#pauseConfirmButtons button{padding:14px 17px;font-size:20px}#pauseHint{font-size:16px}
 }
-@media (max-height:430px), (max-width:620px){#titleContent{padding:10px;gap:6px}#titleSakata{height:clamp(100px,27vh,150px);width:58vw}#titleContent #gameTitle{font-size:clamp(18px,4.6vw,25px)}}
-@media (max-height:430px), (max-width:620px){
+@media (max-height:430px), (max-width:620px), (pointer:coarse){#titleContent{padding:10px;gap:6px}#titleSakata{height:clamp(100px,27vh,150px);width:58vw}#titleContent #gameTitle{font-size:clamp(18px,4.6vw,25px)}}
+@media (max-height:430px), (max-width:620px), (pointer:coarse){
   #titleBottom{padding:7px 10px 9px}
   #gameTitle{font-size:clamp(18px,4.6vw,25px);margin-bottom:7px}
   #titleButtons{gap:10px}
