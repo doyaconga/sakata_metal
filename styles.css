@@ -50,6 +50,8 @@ canvas{width:100%;height:100%;display:block}#ui{position:absolute;inset:0;pointe
 
 #lariatStatus{display:block;margin-top:4px;font-size:10px;letter-spacing:1px;color:#ddd}
 #lariatBtn:disabled{opacity:.65;cursor:default;box-shadow:none}
+#lariatBtn.readyPulse:not(:disabled){animation:lariatReadyPulse 1.15s ease-in-out infinite}
+@keyframes lariatReadyPulse{0%,100%{background:#7a2020;box-shadow:0 2px 0 #3d0d0d,0 0 0 rgba(255,218,82,0)}50%{background:#a62c24;box-shadow:0 2px 0 #5d1712,0 0 16px 5px rgba(255,218,82,.82)}}
 
 #scoreModal{
   position:absolute;inset:0;z-index:200;

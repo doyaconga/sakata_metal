@@ -320,6 +320,7 @@ function syncLariatReadyUi(){
   if(lariatCooldown>0 || lariatTimer>0)return;
   const lb=document.querySelector('#lariatBtn');
   lb.disabled=false;
+  lb.classList.add('readyPulse');
   document.querySelector('#lariatFill').style.transform='scaleX(1)';
   document.querySelector('#lariatLabel').textContent='坂田モッシュ';
   document.querySelector('#lariatStatus').textContent='READY';
@@ -369,8 +370,9 @@ function beginCyclonePreparation(){
   updateItemHud();
   const lb=document.querySelector('#lariatBtn');
   lb.disabled=true;
-  document.querySelector('#lariatLabel').textContent='坂田メロディックスピードメタル';
-  document.querySelector('#lariatStatus').textContent='STANDBY';
+  lb.classList.remove('readyPulse');
+  document.querySelector('#lariatLabel').textContent='坂田モッシュ';
+  document.querySelector('#lariatStatus').textContent='メロスピ準備中';
   showCycloneOverlay('cutin');
   stopBgm();sfxThunder();
 }
@@ -400,10 +402,11 @@ function startCycloneBonus(){
   lariatEndInvuln=0;
   scoreState.lariatCombo=0;scoreState.lariatBonus=0;
   const lb=document.querySelector('#lariatBtn');
-  lb.disabled=true;lb.classList.add('activeNow');
-  document.querySelector('#lariatLabel').textContent='坂田メロディックスピードメタル';
-  document.querySelector('#lariatStatus').textContent='BONUS TIME!';
-  document.querySelector('#activeFill').style.transform='scaleX(1)';
+  lb.disabled=true;lb.classList.remove('activeNow','readyPulse');
+  // Keep the Mosh gauge visible. Its cooldown is deliberately paused during
+  // Melo-Spi, so the fill level remains exactly as it was before the bonus.
+  document.querySelector('#lariatLabel').textContent='坂田モッシュ';
+  document.querySelector('#lariatStatus').textContent='メロスピ中！';
   sfxLariat();startBgm('cyclone');
 }
 function finishCycloneScoring(){
@@ -472,15 +475,16 @@ function reset(){
  document.querySelector('#scoreGain').replaceChildren();
  updateDebugSub();
  updateItemHud();
- const lb=document.querySelector('#lariatBtn');
- lb.disabled=false;
+  const lb=document.querySelector('#lariatBtn');
+  lb.disabled=false;
  document.querySelector('#pauseBtn').classList.remove('hidden');
  
  document.querySelector('#lariatLabel').textContent='坂田モッシュ';
  document.querySelector('#lariatStatus').textContent='READY';
  document.querySelector('#lariatFill').style.transform='scaleX(1)';
  document.querySelector('#activeFill').style.transform='scaleX(1)';
- lb.classList.remove('activeNow');
+  lb.classList.remove('activeNow');
+  lb.classList.add('readyPulse');
  spawnPattern();
  const token=gameToken;
  resetFrameClock();
@@ -503,9 +507,10 @@ function useLariat(){
  scoreState.lariatCombo=0;scoreState.lariatBonus=0;
  sfxLariat();
  startBgm('lariat');
- const lb=document.querySelector('#lariatBtn');
- lb.disabled=true;
- lb.classList.add('activeNow');
+  const lb=document.querySelector('#lariatBtn');
+  lb.disabled=true;
+  lb.classList.add('activeNow');
+  lb.classList.remove('readyPulse');
  document.querySelector('#lariatStatus').textContent='発動中！';
  document.querySelector('#lariatFill').style.transform='scaleX(0)';
  document.querySelector('#activeFill').style.transform='scaleX(1)';
@@ -905,6 +910,7 @@ function update(){
    fill.style.transform='scaleX('+Math.max(0,Math.min(1,ready))+')';
    if(lariatCooldown>0){
      lb.disabled=true;
+     lb.classList.remove('readyPulse');
      if(lariatTimer<=0){
        
        document.querySelector('#lariatStatus').textContent='COOLDOWN';
