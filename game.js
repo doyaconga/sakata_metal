@@ -121,7 +121,7 @@ let run=false,dist=0,cleared=0,stage=1,speed=6,spawnTimer=100,obs=[],dusts=[],ba
 let paused=false,pauseConfirmAction=null,pauseRankingOpen=false;
 let cyclonePieces=0,cycloneState='idle',cycloneTimer=0,cycloneCountdownLabel='',cycloneSpawned=0,cycloneLanePlan=[],cycloneSpinFrames=0,cycloneResultMusicDelay=0,cycloneScoreRevealTimer=0,cycloneScoreRevealPoints=0,nextCyclonePieceAt=350;
 let debugHitboxes=false;
-let items=[],bananaPeels=[],crowDroppings=[],meatShield=0,rescueInvuln=0,hoverFuelFrames=0,hoverHeld=false,hoverActive=false,hoverBreakParticles=[],itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
+let items=[],bananaPeels=[],crowDroppings=[],meatShield=0,rescueInvuln=0,hoverFuelFrames=0,hoverHeld=false,hoverActive=false,hoverBreakParticles=[],itemChancePending=false,itemChanceActive=false,itemChanceChosen=false,itemChanceChosenAt=0,postItemRoadItemsBlocked=false,nextItemChanceAt=600+Math.random()*200,nextChargeAt=250+Math.random()*200;
 let gameOverFragments=[],gameOverExplosionTimer=0,gameOverMessageTimeout=null,playerExploded=false,gameOverRetryReady=false;
 let scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};
 let scoreEffects=[];
@@ -399,6 +399,10 @@ function beginItemChance(){
 function finishItemChance(){
   itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;
   nextItemChanceAt=dist+itemChanceInterval(dist);
+  const roadItemResumeDistance=dist+GAME_CONFIG.itemChanceRoadItemDelayMeters;
+  nextCyclonePieceAt=Math.max(nextCyclonePieceAt,roadItemResumeDistance);
+  nextChargeAt=Math.max(nextChargeAt,roadItemResumeDistance);
+  postItemRoadItemsBlocked=true;
   spawnTimer=360;
 }
 function showCycloneOverlay(mode,text=''){
@@ -525,7 +529,7 @@ function reset(){
  if(gameOverMessageTimeout!==null){clearTimeout(gameOverMessageTimeout);gameOverMessageTimeout=null;}
  run=true;
  dist=0;cleared=0;stage=GAME_CONFIG.startStage;speed=GAME_CONFIG.initialSpeed;spawnTimer=100;groundOffset=0;lariatTimer=0;lariatCooldown=0;lariatEndInvuln=0;thunderLatch=false;
- items=[];bananaPeels=[];crowDroppings=[];meatShield=0;rescueInvuln=0;hoverFuelFrames=0;hoverHeld=false;hoverActive=false;hoverBreakParticles=[];itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
+ items=[];bananaPeels=[];crowDroppings=[];meatShield=0;rescueInvuln=0;hoverFuelFrames=0;hoverHeld=false;hoverActive=false;hoverBreakParticles=[];itemChancePending=false;itemChanceActive=false;itemChanceChosen=false;itemChanceChosenAt=0;postItemRoadItemsBlocked=false;nextItemChanceAt=itemChanceInterval(0);nextChargeAt=chargeInterval();
  obs=[];dusts=[];bannerT=0;bannerGapT=0;pendingSeasonBanner='';patternSeq=0;passedPatterns=new Set();animalSpawnCounts=Object.fromEntries(ANIMAL_TYPES.map(type=>[type,0]));
  gameOverFragments=[];gameOverExplosionTimer=0;playerExploded=false;gameOverRetryReady=false;
  scoreState={bonus:0,passed:0,passBonus:0,defeated:0,lariatCombo:0,lariatBonus:0};scoreEffects=[];
@@ -712,6 +716,7 @@ function resolvePatternMember(o){
  const unresolvedMember=obs.some(other=>other.pid===o.pid&&!other.passed);
  if(!unresolvedMember&&!passedPatterns.has(o.pid)){
    passedPatterns.add(o.pid);
+   if(postItemRoadItemsBlocked)postItemRoadItemsBlocked=false;
    cleared++;
    if(cleared%10===0)advance();
  }
@@ -934,11 +939,11 @@ function update(){
  if(lariatEndInvuln>0)lariatEndInvuln--;
  if(!cycloneActive&&dist>=nextItemChanceAt-GAME_CONFIG.itemChanceLeadMeters&&!itemChanceActive)itemChancePending=true;
  if(!cycloneActive&&itemChancePending&&dist>=nextItemChanceAt&&obs.length===0&&items.length===0)beginItemChance();
- if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&cyclonePieces<GAME_CONFIG.cycloneRequiredPieces&&dist>=nextCyclonePieceAt&&!items.some(it=>it.type==='cyclonePiece'||it.type==='roadCharge')){
+ if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&!postItemRoadItemsBlocked&&cyclonePieces<GAME_CONFIG.cycloneRequiredPieces&&dist>=nextCyclonePieceAt&&!items.some(it=>it.type==='cyclonePiece'||it.type==='roadCharge')){
    items.push({type:'cyclonePiece',group:null,x:W+80,y:G-125,w:46,h:46,taken:false,bob:0});
    nextCyclonePieceAt=dist+cyclonePieceInterval();
  }
- if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&lariatCooldown>0&&dist>=nextChargeAt&&!items.some(it=>it.type==='roadCharge'||it.type==='cyclonePiece')){
+ if(!cycloneActive&&!itemChanceActive&&!itemChancePending&&!postItemRoadItemsBlocked&&lariatCooldown>0&&dist>=nextChargeAt&&!items.some(it=>it.type==='roadCharge'||it.type==='cyclonePiece')){
    items.push({type:'roadCharge',group:null,x:W+80,y:G-125,w:46,h:46,taken:false,bob:0});
    nextChargeAt=dist+chargeInterval();
  }
