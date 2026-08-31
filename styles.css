@@ -466,6 +466,7 @@ body{
   body.touchLayout #score{position:fixed;left:12px;top:max(10px,env(safe-area-inset-top));font-size:18px;z-index:30;}
   body.touchLayout #scoreLabel::after{font-size:18px;}
   body.touchLayout #scoreGain{font-size:14px;}
+  body.touchLayout #banner{font-size:27px;}
   body.touchLayout #pauseBtn{position:fixed;right:12px;top:max(9px,env(safe-area-inset-top));z-index:40;}
   body.touchLayout #sub{position:fixed;left:12px;top:42px;z-index:30;}
   body.touchLayout #cycloneMeter{position:fixed;left:14px;top:calc(56.25vw + 24px);bottom:auto;z-index:30;}
@@ -489,4 +490,16 @@ body{
     width:min(100vw,calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px) * 1.7777778));
     max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);
   }
+  body.touchLayout #lariatWrap{right:12px;bottom:10px;}
+  body.touchLayout #lariatBtn{min-width:138px;padding:7px 9px;font-size:13px;}
+  body.touchLayout #lariatGauge,body.touchLayout #activeGauge{height:6px;margin-top:5px;}
+  body.touchLayout #lariatStatus{margin-top:3px;font-size:9px;}
+  body.touchLayout #panel{width:min(400px,calc(100% - 28px));min-height:0;padding:16px 18px;border-radius:12px;}
+  body.touchLayout #gameOverContent .gameOverTitle{font-size:23px;margin-bottom:4px;}
+  body.touchLayout #gameOverContent .gameOverTotalLabel{font-size:13px;}
+  body.touchLayout #gameOverContent .gameOverTotal{font-size:34px;margin:1px 0 7px;}
+  body.touchLayout #gameOverContent .gameOverStats{column-gap:9px;row-gap:5px;font-size:13px;}
+  body.touchLayout #gameOverMainButtons{gap:8px;margin:12px 0;}
+  body.touchLayout #retryBtn,body.touchLayout #gameOverScoreBtn{width:calc(50% - 4px);padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px;}
+  body.touchLayout #titleReturnBtn{width:100%;padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px;}
 }

@@ -69,7 +69,10 @@ function drawScoreEffects(){
       const pop=1+Math.max(0,1-age/10)*.18;
       x.translate(W/2,185-rise);x.scale(pop,pop);
       x.lineWidth=7;x.strokeStyle='rgba(20,12,5,.78)';
-      x.fillStyle=effect.color||'#fff';x.font='950 42px sans-serif';
+      // The portrait scene is narrower on purpose, so use a smaller in-world
+      // pickup notice there without changing the desktop or landscape game.
+      const compactPortrait=usesTouchLayout()&&matchMedia('(orientation:portrait)').matches;
+      x.fillStyle=effect.color||'#fff';x.font=`950 ${compactPortrait?32:42}px sans-serif`;
       x.strokeText(effect.text,0,0);x.fillText(effect.text,0,0);
     }
     x.restore();
@@ -233,7 +236,8 @@ function draw(){
    if(it.taken)continue;
    x.save();
    x.translate(it.x,it.y+Math.sin(it.bob)*4);
-   x.font='900 12px sans-serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.75)';x.fillStyle='#fff';
+   const compactPortrait=usesTouchLayout()&&matchMedia('(orientation:portrait)').matches;
+   x.font=`900 ${compactPortrait?10:12}px sans-serif`;x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.75)';x.fillStyle='#fff';
    const label=it.type==='shield'?'🛡 GUARD':(it.type==='speedDown'?'🐢 SPEED DOWN':(it.type==='speedUp'?'🐈 SPEED UP':(it.type==='hover'?'🚀 HOVER':(it.type==='cyclonePiece'?'🤘 METAL':`⚡ CHARGE +${Math.round(GAME_CONFIG.chargeRecoveryRatio*100)}%`))));x.strokeText(label,23,-8);x.fillText(label,23,-8);
    drawItemSprite(x,it.type);
    x.restore();
