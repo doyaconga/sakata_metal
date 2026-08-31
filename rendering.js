@@ -620,9 +620,15 @@ function draw(){
    x.fillRect(-38,-19,14,35);x.strokeRect(-38,-19,14,35);
    x.fillStyle=`rgb(${highlightShade},${highlightShade+15},${highlightShade+20})`;x.fillRect(-35,-15,8,22);
    x.fillStyle='#10171c';x.fillRect(-37,-24,12,6);
-   x.fillStyle='#54d9f5';x.fillRect(-37,-29,28,4);
-   x.fillStyle='#18333c';x.fillRect(-37,-29,28,4);
-   x.fillStyle='#6df0ff';x.fillRect(-37,-29,28*fuelRatio,4);
+   // Large fuel meter beside the hover device. The lit section retreats from
+   // the top toward the bottom as fuel is spent, so it remains legible in play.
+   const meterX=-56,meterY=-27,meterW=14,meterH=52,innerX=meterX+3,innerY=meterY+3,innerW=8,innerH=46;
+   x.fillStyle='#10171c';x.fillRect(meterX,meterY,meterW,meterH);
+   x.lineWidth=2;x.strokeStyle='#54d9f5';x.strokeRect(meterX,meterY,meterW,meterH);
+   x.fillStyle='#18333c';x.fillRect(innerX,innerY,innerW,innerH);
+   const remainingHeight=innerH*fuelRatio,remainingY=innerY+innerH-remainingHeight;
+   x.fillStyle='#6df0ff';x.fillRect(innerX,remainingY,innerW,remainingHeight);
+   x.fillStyle='rgba(255,255,255,.62)';x.fillRect(innerX+1,remainingY,2,remainingHeight);
    if(hoverActive){
      const flame=8+(Math.floor(performance.now()/60)%2)*5;
      x.fillStyle='#ff8a28';x.beginPath();x.moveTo(-36,17);x.lineTo(-25,17);x.lineTo(-30,17+flame);x.closePath();x.fill();
