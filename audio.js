@@ -46,7 +46,12 @@ function sfxJump(){
   tone(105,.10,'triangle',.14,155);
 }
 function sfxStart(){
-  initAudio();tone(330,.08,'square',.10,440);tone(440,.08,'square',.10,660,.08);tone(660,.12,'square',.12,880,.16);
+  // A clock-scheduled "piko-n": a crisp E attack followed by a thicker F
+  // chime one semitone higher. The layered tail shares one exact start time.
+  initAudio();
+  tone(659.25,.065,'square',.08);
+  tone(698.46,.26,'square',.09,739.99,.06);
+  tone(698.46,.28,'triangle',.055,739.99,.06);
 }
 function sfxLariat(){
   initAudio();noise(.32,.24,520);tone(105,.38,'sawtooth',.22,48);tone(62,.48,'square',.13,35);

@@ -1577,7 +1577,7 @@ document.querySelector('#pauseBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();initAudio();sfxButton();openPause();
 });
 document.querySelector('#pauseResumeBtn').addEventListener('pointerdown',e=>{
-  e.preventDefault();e.stopPropagation();sfxButton();resumeFromPause();
+  e.preventDefault();e.stopPropagation();sfxStart();resumeFromPause();
 });
 document.querySelector('#pauseScoreBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();e.stopPropagation();if(!paused)return;sfxButton();pauseRankingOpen=true;document.body.classList.add('scoreModalOpen');showScores();
