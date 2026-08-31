@@ -38,7 +38,7 @@ const GAME_CONFIG={
   chargeIntervalMax:450,
   speedDownSteps:2,
   speedUpSteps:2,
-  hoverDurationFrames:120,
+  hoverDurationFrames:60,
   snakeCycleMinFrames:65,
   snakeCycleMaxFrames:135,
   catSpeedMultiplier:1.65,
