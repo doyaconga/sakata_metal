@@ -411,3 +411,82 @@ body{
 }
 
 #meatHud{position:absolute;left:18px;top:105px;font-size:17px;font-weight:900;color:#fff;text-shadow:2px 2px #000}
+
+/* Phone layouts deliberately use two different compositions.  Landscape keeps
+   the original 16:9 game, while portrait reserves the lower screen for the
+   controls and makes every remaining non-button area a jump pad. */
+@media (pointer:coarse) and (orientation:portrait){
+  body{display:block;background:#111;}
+  body.titleOnly #titleScreen{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100dvh;
+    aspect-ratio:auto;
+  }
+  body.gameOnly #gameShell{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100dvh;
+    aspect-ratio:auto;
+    margin:0;
+    overflow:visible;
+    touch-action:none;
+  }
+  body.gameOnly #gameShell #wrap{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100vw;
+    height:auto;
+    aspect-ratio:16/9;
+    max-height:none;
+    overflow:visible;
+  }
+  body.gameOnly #gameShell canvas{width:100%;height:100%;}
+  body.touchLayout #titleContent{
+    justify-content:center;
+    min-height:100%;
+    padding:max(18px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom));
+    gap:clamp(12px,2.2vh,22px);
+  }
+  body.touchLayout #titleSakata{
+    flex:0 0 clamp(130px,25vh,210px);
+    width:min(68vw,360px);
+    height:clamp(130px,25vh,210px);
+  }
+  body.touchLayout #titleContent #gameTitle{font-size:clamp(23px,6vw,32px);line-height:1.1;}
+  body.touchLayout #titleButtons{width:min(520px,100%);gap:clamp(10px,1.8vh,16px);}
+  body.touchLayout #startBtn,body.touchLayout #helpBtn,body.touchLayout #scoreBtn,body.touchLayout #recordBtn,body.touchLayout #collectionBtn{min-height:clamp(45px,7.2vh,58px);font-size:clamp(15px,4vw,19px);padding:8px 6px;}
+  body.touchLayout #startBtn{font-size:clamp(19px,5vw,24px);}
+
+  /* The scene remains undistorted; HUD and controls use the otherwise empty
+     vertical space below it instead of being clipped inside the scene. */
+  body.touchLayout #score{position:fixed;left:12px;top:max(10px,env(safe-area-inset-top));font-size:18px;z-index:30;}
+  body.touchLayout #scoreLabel::after{font-size:18px;}
+  body.touchLayout #scoreGain{font-size:14px;}
+  body.touchLayout #pauseBtn{position:fixed;right:12px;top:max(9px,env(safe-area-inset-top));z-index:40;}
+  body.touchLayout #sub{position:fixed;left:12px;top:42px;z-index:30;}
+  body.touchLayout #cycloneMeter{position:fixed;left:14px;top:calc(56.25vw + 24px);bottom:auto;z-index:30;}
+  body.touchLayout #lariatWrap{position:fixed;right:50%;bottom:max(28px,calc(env(safe-area-inset-bottom) + 18px));transform:translateX(50%);width:min(88vw,400px);z-index:35;}
+  body.touchLayout #lariatBtn{width:100%;min-width:0;font-size:18px;padding:12px 15px;}
+  body.touchLayout #lariatStatus{font-size:12px;}
+  body.touchLayout #msg{position:fixed;inset:0;z-index:100;overflow:auto;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:rgba(0,0,0,.72);}
+  body.touchLayout #panel{width:min(460px,100%);min-height:0;margin:auto;padding:24px 20px;}
+  body.touchLayout #gameOverContent .gameOverTitle{font-size:30px;margin-bottom:8px;}
+  body.touchLayout #gameOverContent .gameOverTotalLabel{font-size:16px;}
+  body.touchLayout #gameOverContent .gameOverTotal{font-size:44px;margin:2px 0 12px;}
+  body.touchLayout #gameOverContent .gameOverStats{font-size:16px;row-gap:9px;}
+  body.touchLayout #gameOverMainButtons{margin:24px 0;gap:10px;}
+  body.touchLayout #retryBtn,body.touchLayout #gameOverScoreBtn{font-size:15px;padding:10px 6px;}
+  body.touchLayout #titleReturnBtn{font-size:15px;padding:10px 6px;}
+}
+
+@media (pointer:coarse) and (orientation:landscape){
+  body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+  #titleScreen,#gameShell{
+    width:min(100vw,calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px) * 1.7777778));
+    max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);
+  }
+}

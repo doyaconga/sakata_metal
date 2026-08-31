@@ -1,4 +1,4 @@
-const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
+const c=document.querySelector('#game'),gameShell=document.querySelector('#gameShell'),x=c.getContext('2d'),W=960,H=540,G=440;
 let canvasRenderScale=1;
 function gameDisplayWidth(){return Math.min(1920,window.innerWidth,window.innerHeight*16/9)}
 function usesTouchLayout(){return navigator.maxTouchPoints>0&&Math.min(window.innerWidth,window.innerHeight)<1000}
@@ -594,22 +594,26 @@ function updateScoreEffects(){
   scoreGainNotices.forEach(notice=>notice.life--);
   scoreGainNotices=scoreGainNotices.filter(notice=>notice.life>0);
 }
-c.addEventListener('pointerdown',e=>{
+gameShell.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right press activates Sakata Mosh immediately.
+  // On portrait phones the scene occupies the upper part of the screen, while
+  // the lower part is intentionally reserved for the controls.  Treat that
+  // whole area as the jump pad, except for actual UI controls and overlays.
+  if(e.target.closest('button,#msg,#pauseOverlay'))return;
   e.preventDefault();
-  if(e.pointerType==='touch')c.setPointerCapture(e.pointerId);
+  if(e.pointerType==='touch')gameShell.setPointerCapture(e.pointerId);
   if(e.button===2){useLariat();return;}
   hoverHeld=true;
   jump();
 });
-c.addEventListener('pointerup',e=>{hoverHeld=false;if(c.hasPointerCapture(e.pointerId))c.releasePointerCapture(e.pointerId)});
-c.addEventListener('pointercancel',e=>{hoverHeld=false;if(c.hasPointerCapture(e.pointerId))c.releasePointerCapture(e.pointerId)});
+gameShell.addEventListener('pointerup',e=>{hoverHeld=false;if(gameShell.hasPointerCapture(e.pointerId))gameShell.releasePointerCapture(e.pointerId)});
+gameShell.addEventListener('pointercancel',e=>{hoverHeld=false;if(gameShell.hasPointerCapture(e.pointerId))gameShell.releasePointerCapture(e.pointerId)});
 c.addEventListener('selectstart',e=>e.preventDefault());
 c.addEventListener('dragstart',e=>e.preventDefault());
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 window.addEventListener('pointerup',()=>{hoverHeld=false});
 window.addEventListener('blur',()=>{hoverHeld=false});
-c.addEventListener('contextmenu',e=>{
+gameShell.addEventListener('contextmenu',e=>{
   // Suppress the browser menu. Activation already happened on pointerdown.
   e.preventDefault();
 });
