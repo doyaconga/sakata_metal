@@ -301,6 +301,14 @@ body.titleOnly #scoreModal:not(.hidden){
 #titleSakata:focus-visible{outline:3px solid #742020;outline-offset:4px;border-radius:8px}
 #titleContent #gameTitle{margin:0;color:#742020;font-size:clamp(24px,4vw,36px)}
 #titleContent #titleButtons{width:min(520px,100%);margin:0}
+@media (min-width:621px){
+  #titleContent{padding:clamp(28px,4vh,54px) clamp(28px,5vw,84px);gap:clamp(18px,2.5vh,28px)}
+  #titleSakata{width:min(58vw,650px);height:clamp(175px,36vh,360px)}
+  #titleContent #gameTitle{font-size:clamp(30px,4.2vw,64px);line-height:1.08}
+  #titleContent #titleButtons{width:min(720px,76vw);gap:clamp(12px,1.35vw,20px)}
+  #startBtn,#helpBtn,#scoreBtn,#recordBtn,#collectionBtn{min-height:clamp(54px,6.4vh,70px);font-size:clamp(18px,2vw,28px);border-width:3px}
+  #startBtn{font-size:clamp(22px,2.45vw,34px)}
+}
 @media (max-height:430px), (max-width:620px){#titleContent{padding:10px;gap:6px}#titleSakata{height:clamp(100px,27vh,150px);width:58vw}#titleContent #gameTitle{font-size:clamp(18px,4.6vw,25px)}}
 @media (max-height:430px), (max-width:620px){
   #titleBottom{padding:7px 10px 9px}
