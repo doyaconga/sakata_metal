@@ -1,6 +1,7 @@
 const c=document.querySelector('#game'),x=c.getContext('2d'),W=960,H=540,G=440;
 let canvasRenderScale=1;
 function gameDisplayWidth(){return Math.min(1920,window.innerWidth,window.innerHeight*16/9)}
+function usesTouchLayout(){return navigator.maxTouchPoints>0&&Math.min(window.innerWidth,window.innerHeight)<1000}
 function updateCanvasRenderResolution(){
   // Keep game logic in the familiar 960 x 540 coordinate system, while using
   // a larger backing canvas when the PC display is larger.
@@ -16,9 +17,11 @@ function updateCanvasRenderResolution(){
 }
 function updateDesktopUiScale(){
   const ui=document.querySelector('#ui');
+  const touchLayout=usesTouchLayout();
+  document.body.classList.toggle('touchLayout',touchLayout);
   // Phones keep their dedicated compact layout. On PC, the canvas and the UI
   // grow together according to the current browser window, not only F11 mode.
-  if(window.matchMedia('(max-width:620px), (pointer:coarse)').matches){
+  if(touchLayout||window.matchMedia('(max-width:620px), (pointer:coarse)').matches){
     ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
     return;
   }
