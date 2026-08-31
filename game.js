@@ -1025,7 +1025,7 @@ function update(){
      else if(it.type==='hover'){
        hoverFuelFrames=GAME_CONFIG.hoverDurationFrames;
        p.rot=0;
-       scoreEffects.push({type:'itemNotice',text:`🚀 HOVER ${GAME_CONFIG.hoverDurationFrames/60} SEC`,color:'#9fefff',life:90,maxLife:90});
+       scoreEffects.push({type:'itemNotice',text:'🚀 HOVER',color:'#9fefff',life:90,maxLife:90});
      }
      updateItemHud();
      sfxButton();
