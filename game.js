@@ -594,12 +594,11 @@ function updateScoreEffects(){
   scoreGainNotices.forEach(notice=>notice.life--);
   scoreGainNotices=scoreGainNotices.filter(notice=>notice.life>0);
 }
-gameShell.addEventListener('pointerdown',e=>{
+document.addEventListener('pointerdown',e=>{
   // Left click / touch = jump. Right press activates Sakata Mosh immediately.
-  // On portrait phones the scene occupies the upper part of the screen, while
-  // the lower part is intentionally reserved for the controls.  Treat that
-  // whole area as the jump pad, except for actual UI controls and overlays.
-  if(e.target.closest('button,#msg,#pauseOverlay'))return;
+  // The whole browser viewport is the jump pad during play, including the
+  // black side margins in landscape.  Actual controls and overlays stay out.
+  if(!document.body.classList.contains('gameOnly')||e.target.closest('button,#msg,#pauseOverlay,#scoreModal,#recordModal,#collectionModal,#helpModal,#debugModal'))return;
   e.preventDefault();
   if(e.pointerType==='touch')gameShell.setPointerCapture(e.pointerId);
   if(e.button===2){useLariat();return;}
@@ -613,9 +612,9 @@ c.addEventListener('dragstart',e=>e.preventDefault());
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 window.addEventListener('pointerup',()=>{hoverHeld=false});
 window.addEventListener('blur',()=>{hoverHeld=false});
-gameShell.addEventListener('contextmenu',e=>{
+document.addEventListener('contextmenu',e=>{
   // Suppress the browser menu. Activation already happened on pointerdown.
-  e.preventDefault();
+  if(document.body.classList.contains('gameOnly'))e.preventDefault();
 });
 document.querySelector('#lariatBtn').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();useLariat()});
 
