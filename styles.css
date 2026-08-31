@@ -508,4 +508,18 @@ body{
   body.touchLayout #gameOverMainButtons{gap:8px;margin:12px 0;}
   body.touchLayout #retryBtn,body.touchLayout #gameOverScoreBtn{width:calc(50% - 4px);padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px;}
   body.touchLayout #titleReturnBtn{width:100%;padding:7px 4px;border-width:2px;border-radius:8px;font-size:12px;}
+  /* Safari's address bar leaves less room in landscape.  Keep every modal
+     inside the dynamic viewport and scroll its own contents when necessary. */
+  #scoreModal,#recordModal,#collectionModal,#helpModal,#debugModal{
+    align-items:flex-start;
+    overflow-y:auto;
+    padding:max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));
+  }
+  #scorePanel,#recordPanel,#collectionPanel,#helpPanel,#debugPanel{
+    max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+    margin-block:auto;
+    overflow:auto;
+  }
+  #msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));background:rgba(0,0,0,.72);}
+  #msg #panel{margin:auto;}
 }
