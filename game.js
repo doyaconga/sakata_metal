@@ -4,7 +4,9 @@ function gameDisplayWidth(){return Math.min(1920,window.innerWidth,window.innerH
 function updateCanvasRenderResolution(){
   // Keep game logic in the familiar 960 x 540 coordinate system, while using
   // a larger backing canvas when the PC display is larger.
-  const nextScale=Math.min(2,Math.max(1,gameDisplayWidth()/W));
+  // 1.5x (1440 x 810) keeps desktop artwork crisp while avoiding the 4x
+  // fill-rate cost of a full 1920 x 1080 redraw during busy seasonal scenes.
+  const nextScale=Math.min(1.5,Math.max(1,gameDisplayWidth()/W));
   const nextWidth=Math.round(W*nextScale),nextHeight=Math.round(H*nextScale);
   if(c.width===nextWidth&&c.height===nextHeight){canvasRenderScale=nextScale;return}
   c.width=nextWidth;c.height=nextHeight;
@@ -657,6 +659,12 @@ function advance(){
  stage++;speed=Math.min(GAME_CONFIG.maxSpeed,speed+GAME_CONFIG.speedStep);
  let b=document.querySelector('#banner');b.textContent=`STAGE ${stage}`;b.classList.add('show');bannerT=85;
  pendingSeasonBanner=(stage-1)%4===0?SEASON_NAMES[season()]:'';
+ // Prepare the next season one stage early, outside the active game frame.
+ // That avoids a one-frame hitch when the visible season actually changes.
+ if(stage%4===0){
+   const warm=()=>warmSeasonStaticLayer((season()+1)%4);
+   if('requestIdleCallback' in window)window.requestIdleCallback(warm,{timeout:1000});else setTimeout(warm,0);
+ }
 }
 function registerAnimalPass(o){
  const basePoints=GAME_CONFIG.passScores[o.type]||0;
