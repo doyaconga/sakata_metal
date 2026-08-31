@@ -1,13 +1,16 @@
 const c=document.querySelector('#game'),gameShell=document.querySelector('#gameShell'),x=c.getContext('2d'),W=960,H=540,G=440;
 let canvasRenderScale=1;
+const MAX_CANVAS_RENDER_SCALE=1;
 function gameDisplayWidth(){return Math.min(1920,window.innerWidth,window.innerHeight*16/9)}
 function usesTouchLayout(){return navigator.maxTouchPoints>0&&Math.min(window.innerWidth,window.innerHeight)<1000}
 function updateCanvasRenderResolution(){
   // Keep game logic in the familiar 960 x 540 coordinate system, while using
   // a larger backing canvas when the PC display is larger.
-  // 1.5x (1440 x 810) keeps desktop artwork crisp while avoiding the 4x
-  // fill-rate cost of a full 1920 x 1080 redraw during busy seasonal scenes.
-  const nextScale=Math.min(1.5,Math.max(1,gameDisplayWidth()/W));
+  // Keep desktop and mobile on the same 960 x 540 internal resolution. CSS
+  // still scales the game to the full display size with smoothing, while the
+  // fixed backing size avoids extra fill-rate cost on systems with weak or
+  // disabled GPU canvas acceleration.
+  const nextScale=Math.min(MAX_CANVAS_RENDER_SCALE,Math.max(1,gameDisplayWidth()/W));
   const nextWidth=Math.round(W*nextScale),nextHeight=Math.round(H*nextScale);
   if(c.width===nextWidth&&c.height===nextHeight){canvasRenderScale=nextScale;return}
   c.width=nextWidth;c.height=nextHeight;
@@ -38,10 +41,29 @@ function updateDesktopUiScale(){
 }
 updateCanvasRenderResolution();
 updateDesktopUiScale();
-window.addEventListener('resize',()=>{updateCanvasRenderResolution();updateDesktopUiScale()});
+window.addEventListener('resize',()=>{
+  updateCanvasRenderResolution();updateDesktopUiScale();
+  if(titleMode)scheduleTitleSeasonWarmup();
+});
 // The title screen is the initial scene. This used to live in the removed
 // title-demo script, but the game itself also relies on it for screen changes.
 let titleMode=true;
+let titleSeasonWarmupGeneration=0;
+function scheduleTitleSeasonWarmup(){
+  const generation=++titleSeasonWarmupGeneration;
+  let nextSeason=0;
+  const warmNext=()=>{
+    if(generation!==titleSeasonWarmupGeneration||!titleMode)return;
+    warmSeasonStaticLayer(nextSeason++);
+    if(nextSeason<4){
+      if('requestIdleCallback' in window)window.requestIdleCallback(warmNext,{timeout:500});
+      else setTimeout(warmNext,0);
+    }else getSummerWavePaths();
+  };
+  if('requestIdleCallback' in window)window.requestIdleCallback(warmNext,{timeout:500});
+  else setTimeout(warmNext,0);
+}
+scheduleTitleSeasonWarmup();
 let debugModeEnabled=false;
 const KONAMI_COMMAND=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
 let konamiCommandIndex=0;
@@ -665,12 +687,6 @@ function advance(){
  stage++;speed=Math.min(GAME_CONFIG.maxSpeed,speed+GAME_CONFIG.speedStep);
  let b=document.querySelector('#banner');b.textContent=`STAGE ${stage}`;b.classList.add('show');bannerT=85;
  pendingSeasonBanner=(stage-1)%4===0?SEASON_NAMES[season()]:'';
- // Prepare the next season one stage early, outside the active game frame.
- // That avoids a one-frame hitch when the visible season actually changes.
- if(stage%4===0){
-   const warm=()=>warmSeasonStaticLayer((season()+1)%4);
-   if('requestIdleCallback' in window)window.requestIdleCallback(warm,{timeout:1000});else setTimeout(warm,0);
- }
 }
 function registerAnimalPass(o){
  const basePoints=GAME_CONFIG.passScores[o.type]||0;
@@ -1232,7 +1248,10 @@ function loop(token,now=performance.now()){
    frameAccumulator-=FIXED_STEP_MS;
    steps++;
  }
- draw();
+ // The simulation has no interpolation, so drawing again before the next
+ // fixed update only paints an identical frame. On 120/144 Hz displays this
+ // used to nearly double the rendering load as more animals unlocked.
+ if(steps>0||!run)draw();
  if(run || gameOverExplosionTimer>0 || gameOverFragments.length){
    rafId=requestAnimationFrame(nextNow=>loop(token,nextNow));
  }else{
@@ -1333,6 +1352,7 @@ function returnToTitle(){
   document.body.classList.remove('gameOnly');
   document.body.classList.remove('scoreModalOpen');
   document.body.classList.add('titleOnly');
+  scheduleTitleSeasonWarmup();
   startBgm('title');
 }
 function restartGame(){
@@ -1380,6 +1400,11 @@ document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
     return;
   }
 
+  // Finish any title-screen warmup before gameplay starts. Normally these are
+  // already cached by idle callbacks, but a very fast START still cannot defer
+  // seasonal scenery generation into the active run.
+  warmAllSeasonStaticLayers();
+  titleSeasonWarmupGeneration++;
   initAudio();
   sfxStart();
   startBgm('game');

@@ -104,12 +104,34 @@ function seasonStaticLayer(sn){
  return layer;
 }
 function warmSeasonStaticLayer(sn){seasonStaticLayer(sn)}
+function warmAllSeasonStaticLayers(){
+ for(let sn=0;sn<4;sn++)warmSeasonStaticLayer(sn);
+ getSummerWavePaths();
+}
+const summerWavePeriod=Math.PI*96;
+let summerWavePaths=null;
+function getSummerWavePaths(){
+ if(summerWavePaths)return summerWavePaths;
+ summerWavePaths=[];
+ for(let row=0;row<3;row++){
+  const path=new Path2D();
+  for(let px=-summerWavePeriod;px<=W+summerWavePeriod;px+=16){
+   const py=326+row*27+Math.sin(px/48)*3;
+   px===-summerWavePeriod?path.moveTo(px,py):path.lineTo(px,py);
+  }
+  summerWavePaths.push(path);
+ }
+ return summerWavePaths;
+}
 function drawSeasonScenery(sn){
  const loop=(value,size)=>((value%size)+size)%size;
  x.drawImage(seasonStaticLayer(sn),0,0,W,H);
  if(sn===1){
   x.strokeStyle='rgba(235,250,255,.72)';x.lineWidth=3;
-  for(let row=0;row<3;row++){x.beginPath();for(let px=0;px<=W;px+=32){const py=326+row*27+Math.sin((px+groundOffset*.12)/48)*3;px?x.lineTo(px,py):x.moveTo(px,py)}x.stroke()}
+  const waveOffset=loop(groundOffset*.12,summerWavePeriod);
+  x.save();x.translate(-waveOffset,0);
+  for(const path of getSummerWavePaths())x.stroke(path);
+  x.restore();
  }
  if(sn===0){x.fillStyle='rgba(255,220,232,.85)';for(let i=0;i<18;i++){const px=loop(i*181-groundOffset*.18,1040)-40,py=90+(i*67)%270;x.beginPath();x.ellipse(px,py,4,2,((i%5)-2)*.25,0,7);x.fill()}}
  else if(sn===2){x.fillStyle='rgba(224,119,44,.80)';for(let i=0;i<16;i++){const px=loop(i*157-groundOffset*.22,1040)-40,py=110+(i*83)%285;x.save();x.translate(px,py);x.rotate(i+groundOffset*.002);x.fillRect(-5,-2,10,5);x.restore()}}

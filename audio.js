@@ -110,6 +110,8 @@ let bgmMode='none';
 let bgmTimer=null;
 let bgmStep=0;
 let bgmGain=null;
+let bgmNextNoteTime=0;
+let bgmScheduleTime=null;
 
 function ensureBgmGain(){
   initAudio();
@@ -124,7 +126,7 @@ function ensureBgmGain(){
 
 function bgmTone(freq,dur=.16,type='triangle',vol=.16,delay=0){
   if(!audioCtx||!bgmGain)return;
-  const t=audioCtx.currentTime+delay;
+  const t=(bgmScheduleTime??audioCtx.currentTime)+delay;
   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
   o.type=type;
   o.frequency.setValueAtTime(freq,t);
@@ -136,7 +138,7 @@ function bgmTone(freq,dur=.16,type='triangle',vol=.16,delay=0){
 }
 function bgmNoise(dur=.08,vol=.10,lowpass=1700,delay=0){
   if(!audioCtx||!bgmGain||!noiseBuffer)return;
-  const t=audioCtx.currentTime+delay;
+  const t=(bgmScheduleTime??audioCtx.currentTime)+delay;
   const n=audioCtx.createBufferSource(),f=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
   n.buffer=noiseBuffer;
   f.type='lowpass';f.frequency.value=lowpass;
@@ -148,20 +150,10 @@ function bgmNoise(dur=.08,vol=.10,lowpass=1700,delay=0){
 
 function stopBgm(){
   if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null;}
-  bgmMode='none';bgmStep=0;
+  bgmMode='none';bgmStep=0;bgmNextNoteTime=0;bgmScheduleTime=null;
 }
 
-function startBgm(mode){
-  if(!ensureBgmGain())return;
-  if(bgmMode===mode && bgmTimer)return;
-  if(bgmTimer)clearInterval(bgmTimer);
-  bgmMode=mode;
-  bgmStep=0;
-
-  const interval = mode==='title' ? 310 : mode==='game' ? 145 : mode==='cyclone' ? 78 : 72;
-  bgmTimer=setInterval(()=>{
-    if(!audioCtx||audioCtx.state!=='running')return;
-
+function scheduleBgmStep(){
     if(bgmMode==='title'){
       // Gentle major-key arpeggio / toy-box feel.
       const notes=[261.63,329.63,392.00,523.25,392.00,329.63,293.66,349.23];
@@ -227,5 +219,37 @@ function startBgm(mode){
       }
     }
     bgmStep++;
-  },interval);
+}
+
+function startBgm(mode){
+  if(!ensureBgmGain())return;
+  if(bgmMode===mode && bgmTimer)return;
+  if(bgmTimer)clearInterval(bgmTimer);
+  bgmMode=mode;
+  bgmStep=0;
+  bgmNextNoteTime=audioCtx.currentTime+.04;
+
+  // Web Audio keeps playing scheduled notes even if a busy render frame
+  // briefly delays JavaScript. Queue a short rolling window instead of
+  // creating each beat only when a setInterval callback happens to run.
+  const scheduler=()=>{
+    if(!audioCtx)return;
+    if(audioCtx.state!=='running'){
+      bgmNextNoteTime=audioCtx.currentTime+.04;
+      return;
+    }
+    // Never burst through beats that were already missed after a long tab or
+    // device stall; resume from the current audio clock instead.
+    if(bgmNextNoteTime<audioCtx.currentTime-.02)bgmNextNoteTime=audioCtx.currentTime+.02;
+    const intervalSeconds=(bgmMode==='title'?310:bgmMode==='game'?145:bgmMode==='cyclone'?78:72)/1000;
+    const scheduleUntil=audioCtx.currentTime+.16;
+    while(bgmNextNoteTime<scheduleUntil){
+      bgmScheduleTime=bgmNextNoteTime;
+      scheduleBgmStep();
+      bgmNextNoteTime+=intervalSeconds;
+    }
+    bgmScheduleTime=null;
+  };
+  scheduler();
+  bgmTimer=setInterval(scheduler,40);
 }
