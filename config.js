@@ -46,7 +46,9 @@ const GAME_CONFIG={
   itemChanceRanges:[[0,1500,600,800],[1500,3000,800,1000],[3000,Infinity,1000,1200]],
   itemChanceLeadMeters:30,
   itemChanceExitMeters:30,
-  passScores:{pig:50,turtle:50,frog:60,cat:90,birds:70,snake:90,cow:90,bats:90,rabbit:100,dog:100,monkey:100,crow:100},
+  // Base pass score rises by five points for each newly introduced animal.
+  // Keep this order aligned with ANIMAL_UNLOCK_STAGE above.
+  passScores:{pig:50,turtle:55,frog:60,birds:65,cow:70,cat:75,snake:80,bats:85,rabbit:90,dog:95,monkey:100,crow:105},
   passSpeedMultiplierCap:2,
   cycloneDefeatBaseScore:100,
   cycloneComboStepScore:5,
