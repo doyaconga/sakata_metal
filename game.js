@@ -1286,6 +1286,34 @@ function restartGame(){
   reset();
 }
 
+const TITLE_SAKATA_FACES=[
+  {src:'assets/sakata-face-neutral.png',scale:.9},
+  {src:'assets/sakata-face-smirk.png',scale:.9},
+  {src:'assets/sakata-face-shout.png',scale:1},
+  {src:'assets/sakata-face-surprised.png',scale:1},
+  {src:'assets/sakata-face-teary.png',scale:1}
+];
+let titleSakataFaceIndex=-1;
+function changeTitleSakataFace(){
+  let nextIndex=titleSakataFaceIndex;
+  while(nextIndex===titleSakataFaceIndex)nextIndex=Math.floor(Math.random()*TITLE_SAKATA_FACES.length);
+  titleSakataFaceIndex=nextIndex;
+  const face=TITLE_SAKATA_FACES[nextIndex],image=document.querySelector('#titleSakata');
+  image.src=face.src;
+  image.style.setProperty('--title-sakata-scale',face.scale);
+}
+const titleSakata=document.querySelector('#titleSakata');
+titleSakata.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  changeTitleSakataFace();
+});
+titleSakata.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  e.preventDefault();
+  changeTitleSakataFace();
+});
+
 document.querySelector('#startBtn').addEventListener('pointerdown',e=>{
   e.preventDefault();
   e.stopPropagation();
