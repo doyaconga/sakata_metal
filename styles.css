@@ -207,7 +207,7 @@ body.titleOnly #scoreModal:not(.hidden){
   z-index:1000;
   display:flex;
   flex-direction:column;
-  background:#111;
+  background:linear-gradient(160deg,#f8ddc1 0%,#f2c89e 56%,#c9855d 100%);
 }
 
 #titleBottom{
@@ -291,6 +291,12 @@ body.titleOnly #scoreModal:not(.hidden){
     linear-gradient(180deg,rgba(61,116,65,.95) 0 18%,rgba(79,132,70,.95) 19% 28%,transparent 29%),
     repeating-linear-gradient(90deg,transparent 0 110px,rgba(255,255,255,.08) 111px 112px);
 }
+#titleScreen{background:linear-gradient(160deg,#f8ddc1 0%,#f2c89e 56%,#c9855d 100%)}
+#titleContent{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;padding:18px 16px;gap:10px;text-align:center}
+#titleSakata{display:block;width:auto;height:clamp(120px,36vh,230px);max-width:min(68vw,380px);object-fit:contain;filter:drop-shadow(7px 9px 0 rgba(45,33,23,.24))}
+#titleContent #gameTitle{margin:0;color:#742020;font-size:clamp(24px,4vw,36px)}
+#titleContent #titleButtons{width:min(520px,100%);margin:0}
+@media (max-height:430px), (max-width:620px){#titleContent{padding:10px;gap:6px}#titleSakata{height:clamp(100px,27vh,150px);max-width:58vw}#titleContent #gameTitle{font-size:clamp(18px,4.6vw,25px)}}
 @media (max-height:430px), (max-width:620px){
   #titleBottom{padding:7px 10px 9px}
   #gameTitle{font-size:clamp(18px,4.6vw,25px);margin-bottom:7px}
@@ -323,7 +329,7 @@ body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background:#111;
+  background:linear-gradient(160deg,#f8ddc1 0%,#f2c89e 56%,#c9855d 100%);
   box-sizing:border-box;
 }
 #gameShell{
