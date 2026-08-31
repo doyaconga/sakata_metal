@@ -1277,6 +1277,12 @@ function openPause(){
   showPauseMenu();
   document.querySelector('#pauseOverlay').classList.remove('hidden');
 }
+// A phone lock, app switch, or browser tab change should never spend a life
+// while the player cannot see the game.  Visibility changes are used instead
+// of window blur so ordinary taps on the browser chrome do not pause it.
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)openPause();
+});
 function resumeFromPause(){
   if(!paused)return;
   if(pauseRankingOpen)closePauseRanking();
