@@ -5,7 +5,9 @@ const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
 const DEBUG_SETTINGS_VERSION=8;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ'],['monkey','サル'],['crow','カラス']];
 const ANIMAL_TYPES=ANIMAL_OPTIONS.map(option=>option[0]);
-const ANIMAL_UNLOCK_STAGE={pig:1,turtle:1,frog:2,birds:2,cow:3,cat:3,snake:4,bats:4,rabbit:5,dog:5,monkey:5,crow:6};
+// Introduce one new animal per stage so players can learn each behavior before
+// new combinations begin appearing in later stages.
+const ANIMAL_UNLOCK_STAGE={pig:1,turtle:2,frog:3,birds:4,cow:5,cat:6,snake:7,bats:8,rabbit:9,dog:10,monkey:11,crow:12};
 let debugEnabledAnimals=new Set(ANIMAL_TYPES);
 const GAME_CONFIG={
   startStage:1,
