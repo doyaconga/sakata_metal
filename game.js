@@ -22,22 +22,13 @@ function updateDesktopUiScale(){
   const ui=document.querySelector('#ui');
   const touchLayout=usesTouchLayout();
   document.body.classList.toggle('touchLayout',touchLayout);
-  // Phones keep their dedicated compact layout. On PC, the canvas and the UI
-  // grow together according to the current browser window, not only F11 mode.
-  if(touchLayout||window.matchMedia('(max-width:620px), (pointer:coarse)').matches){
-    ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
-    return;
-  }
-  const gameWidth=gameDisplayWidth();
-  const scale=Math.max(1,gameWidth/W);
-  if(scale<=1.01){
-    ui.style.removeProperty('width');ui.style.removeProperty('height');ui.style.removeProperty('transform');ui.style.removeProperty('transform-origin');
-    return;
-  }
-  ui.style.width=`${100/scale}%`;
-  ui.style.height=`${100/scale}%`;
-  ui.style.transform=`scale(${scale})`;
-  ui.style.transformOrigin='top left';
+  // The UI lives inside #wrap, which already scales with the game canvas.
+  // Avoid a second CSS transform on desktop; it creates an extra large
+  // composited layer and can make the evening/summer scene stutter on PCs.
+  ui.style.removeProperty('width');
+  ui.style.removeProperty('height');
+  ui.style.removeProperty('transform');
+  ui.style.removeProperty('transform-origin');
 }
 updateCanvasRenderResolution();
 updateDesktopUiScale();
@@ -58,7 +49,7 @@ function scheduleTitleSeasonWarmup(){
     if(nextSeason<4){
       if('requestIdleCallback' in window)window.requestIdleCallback(warmNext,{timeout:500});
       else setTimeout(warmNext,0);
-    }else getSummerWavePaths();
+    }else warmAnimalSpriteLayers();
   };
   if('requestIdleCallback' in window)window.requestIdleCallback(warmNext,{timeout:500});
   else setTimeout(warmNext,0);
@@ -1266,6 +1257,7 @@ function loop(token,now=performance.now()){
 loadDebugSettings();
 setDebugMode(false);
 window.addEventListener('keydown',e=>{
+  if(!DEBUG_BUILD)return;
   if(e.repeat)return;
   const expected=KONAMI_COMMAND[konamiCommandIndex];
   if(e.code===expected){

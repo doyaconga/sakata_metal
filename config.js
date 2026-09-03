@@ -1,6 +1,6 @@
 const skies=[[150,210,245],[80,180,240],[238,137,105],[25,38,75]];
 const SEASON_NAMES=['SPRING','SUMMER','AUTUMN','WINTER'];
-const DEBUG_BUILD=true; // 最終公開版では false にするとDEBUG画面を完全に隠せます。
+const DEBUG_BUILD=false; // 公開版ではDEBUG画面と隠しコマンドを無効化します。
 const DEBUG_STORAGE_KEY='zangiefAnimalDebugSettingsV1';
 const DEBUG_SETTINGS_VERSION=8;
 const ANIMAL_OPTIONS=[['pig','ブタ'],['turtle','カメ'],['frog','カエル'],['dog','イヌ'],['cat','ネコ'],['birds','トリ'],['bats','コウモリ'],['snake','ヘビ'],['rabbit','ウサギ'],['cow','ウシ'],['monkey','サル'],['crow','カラス']];

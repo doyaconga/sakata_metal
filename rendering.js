@@ -41,6 +41,72 @@ function drawTutorialAnimalSprite(ctx,o){
  return false;
 }
 
+let birdFlockStaticLayer=null;
+function drawBirdFlockSprite(ctx){
+ const body='#e2b94f',outline='#765f25';
+ for(const [bx,by] of [[20,14],[55,8],[90,14],[125,8]]){
+  ctx.strokeStyle=outline;ctx.lineWidth=3;ctx.fillStyle=body;
+  ctx.beginPath();ctx.ellipse(bx,by+11,11,8,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(bx-8,by+9,8,5,-.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx+4,by+8,3.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(bx+5,by+8,1.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#c8782e';ctx.beginPath();ctx.moveTo(bx+10,by+11);ctx.lineTo(bx+18,by+14);ctx.lineTo(bx+10,by+16);ctx.closePath();ctx.fill();
+ }
+}
+function warmBirdFlockLayer(){
+ if(birdFlockStaticLayer)return birdFlockStaticLayer;
+ birdFlockStaticLayer=document.createElement('canvas');birdFlockStaticLayer.width=175;birdFlockStaticLayer.height=42;
+ drawBirdFlockSprite(birdFlockStaticLayer.getContext('2d'));
+ return birdFlockStaticLayer;
+}
+
+const ANIMAL_SPRITE_SPECS={pig:[64,48],turtle:[58,34],frog:[46,36],birds:[175,42],cow:[115,107],cat:[52,40],snake:[100,98],bats:[175,58],rabbit:[44,38],dog:[58,42],monkey:[60,54],crow:[68,42]};
+const ANIMAL_SPRITE_FRAME_COUNTS={pig:4,turtle:4,frog:1,birds:1,cow:4,cat:4,snake:12,bats:1,rabbit:1,dog:4,monkey:4,crow:4};
+const ANIMAL_SPRITE_FRAME_SPEEDS={pig:1,turtle:.55,cow:.46,cat:1.35,dog:1,monkey:1.2,crow:1.8};
+const animalSpriteLayers=new Map();
+const ANIMAL_SPRITE_PAD=24;
+let animalSpriteCaptureMode=false;
+function animalSpriteFrameIndex(o,count){
+ if(count<=1)return 0;
+ if(o.type==='snake')return Math.max(0,Math.min(count-1,Math.round((o.rearLift||0)*(count-1))));
+ const speed=ANIMAL_SPRITE_FRAME_SPEEDS[o.type]||1;
+ const phase=((o.age*.23*speed)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+ return Math.floor(phase/(Math.PI*2)*count)%count;
+}
+function animalSpriteFor(o){
+ const count=ANIMAL_SPRITE_FRAME_COUNTS[o.type]||1;
+ return animalSpriteLayers.get(`${o.type}:${animalSpriteFrameIndex(o,count)}`)||null;
+}
+function drawCachedAnimalSprite(ctx,o,sprite){
+ const sx=o.w/sprite.w,sy=o.h/sprite.h;
+ ctx.drawImage(sprite.canvas,-sprite.pad*sx,-sprite.pad*sy,sprite.canvas.width*sx,sprite.canvas.height*sy);
+}
+function warmAnimalSpriteLayers(){
+ if(animalSpriteLayers.size)return;
+ const savedObs=obs;
+ animalSpriteCaptureMode=true;
+ try{
+  for(const [type,[w,maxH]] of Object.entries(ANIMAL_SPRITE_SPECS)){
+   const count=ANIMAL_SPRITE_FRAME_COUNTS[type]||1;
+   const speed=ANIMAL_SPRITE_FRAME_SPEEDS[type]||1;
+   for(let frame=0;frame<count;frame++){
+    const lift=type==='snake'?(frame/(count-1)):0;
+    const h=type==='snake'?(18+lift*80):maxH;
+    const phase=frame/count*Math.PI*2;
+    const age=phase/(.23*speed);
+    obs=[{x:ANIMAL_SPRITE_PAD,y:ANIMAL_SPRITE_PAD,type,w,h,age,rearLift:lift,dogDir:-1,flying:false,flyRot:0}];
+    draw();
+    const layer=document.createElement('canvas');layer.width=w+ANIMAL_SPRITE_PAD*2;layer.height=h+ANIMAL_SPRITE_PAD*2;
+    layer.getContext('2d').drawImage(c,0,0,layer.width,layer.height,0,0,layer.width,layer.height);
+    animalSpriteLayers.set(`${type}:${frame}`,{canvas:layer,w,h,pad:ANIMAL_SPRITE_PAD});
+   }
+  }
+ }finally{
+  obs=savedObs;
+  animalSpriteCaptureMode=false;
+ }
+}
+
 function drawScoreEffects(){
   for(const effect of scoreEffects){
     const age=effect.maxLife-effect.life;
@@ -86,6 +152,8 @@ function drawSeasonStaticScenery(ctx,sn){
   for(const tx of [115,520,875]){x.fillStyle='rgba(91,63,47,.72)';x.fillRect(tx-8,292,16,G-292);x.fillStyle='rgba(255,183,210,.80)';for(const [dx,dy,r] of [[-30,0,34],[8,-22,42],[42,5,31],[-2,20,38]]){x.beginPath();x.arc(tx+dx,292+dy,r,0,7);x.fill()}}
  }else if(sn===1){
   x.fillStyle='rgba(39,151,207,.70)';x.fillRect(0,302,W,98);x.fillStyle='rgba(242,211,139,.88)';x.fillRect(0,390,W,G-390);
+  x.strokeStyle='rgba(235,250,255,.72)';x.lineWidth=3;
+  for(let row=0;row<3;row++){x.beginPath();for(let px=0;px<=W;px+=16){const py=326+row*27+Math.sin(px/48)*3;px?x.lineTo(px,py):x.moveTo(px,py)}x.stroke()}
   for(const tx of [155,760]){x.strokeStyle='rgba(91,59,31,.92)';x.lineWidth=17;x.lineCap='round';x.beginPath();x.moveTo(tx,414);x.quadraticCurveTo(tx-10,342,tx+18,274);x.stroke();x.strokeStyle='rgba(191,133,61,.90)';x.lineWidth=10;x.beginPath();x.moveTo(tx,414);x.quadraticCurveTo(tx-8,343,tx+18,274);x.stroke();x.strokeStyle='rgba(111,71,34,.55)';x.lineWidth=2;for(let j=0;j<5;j++){const yy=397-j*25;x.beginPath();x.moveTo(tx-5,yy);x.lineTo(tx+7,yy-4);x.stroke()}const crownX=tx+18,crownY=274;x.strokeStyle='rgba(25,111,59,.96)';x.lineWidth=9;x.lineCap='round';for(const [dx,dy,cx,cy] of [[-75,18,-42,-16],[-58,-28,-28,-38],[-12,-55,-9,-35],[42,-48,23,-36],[78,-12,45,-24],[68,30,42,8],[-52,40,-35,12]]){x.beginPath();x.moveTo(crownX,crownY);x.quadraticCurveTo(crownX+cx,crownY+cy,crownX+dx,crownY+dy);x.stroke()}x.fillStyle='#77502b';for(const [dx,dy] of [[-8,8],[8,10],[1,20]]){x.beginPath();x.arc(crownX+dx,crownY+dy,7,0,7);x.fill()}}
  }else if(sn===2){
   for(const [tx,col] of [[125,'#d85f36'],[500,'#e4a22d'],[845,'#b94432']]){x.fillStyle='rgba(91,59,39,.78)';x.fillRect(tx-9,292,18,G-292);x.fillStyle=col;x.globalAlpha=.78;for(const [dx,dy,r] of [[-34,5,36],[2,-24,43],[40,4,34],[4,22,39]]){x.beginPath();x.arc(tx+dx,292+dy,r,0,7);x.fill()}x.globalAlpha=1}
@@ -106,33 +174,11 @@ function seasonStaticLayer(sn){
 function warmSeasonStaticLayer(sn){seasonStaticLayer(sn)}
 function warmAllSeasonStaticLayers(){
  for(let sn=0;sn<4;sn++)warmSeasonStaticLayer(sn);
- getSummerWavePaths();
-}
-const summerWavePeriod=Math.PI*96;
-let summerWavePaths=null;
-function getSummerWavePaths(){
- if(summerWavePaths)return summerWavePaths;
- summerWavePaths=[];
- for(let row=0;row<3;row++){
-  const path=new Path2D();
-  for(let px=-summerWavePeriod;px<=W+summerWavePeriod;px+=16){
-   const py=326+row*27+Math.sin(px/48)*3;
-   px===-summerWavePeriod?path.moveTo(px,py):path.lineTo(px,py);
-  }
-  summerWavePaths.push(path);
- }
- return summerWavePaths;
+ warmAnimalSpriteLayers();
 }
 function drawSeasonScenery(sn){
  const loop=(value,size)=>((value%size)+size)%size;
  x.drawImage(seasonStaticLayer(sn),0,0,W,H);
- if(sn===1){
-  x.strokeStyle='rgba(235,250,255,.72)';x.lineWidth=3;
-  const waveOffset=loop(groundOffset*.12,summerWavePeriod);
-  x.save();x.translate(-waveOffset,0);
-  for(const path of getSummerWavePaths())x.stroke(path);
-  x.restore();
- }
  if(sn===0){x.fillStyle='rgba(255,220,232,.85)';for(let i=0;i<18;i++){const px=loop(i*181-groundOffset*.18,1040)-40,py=90+(i*67)%270;x.beginPath();x.ellipse(px,py,4,2,((i%5)-2)*.25,0,7);x.fill()}}
  else if(sn===2){x.fillStyle='rgba(224,119,44,.80)';for(let i=0;i<16;i++){const px=loop(i*157-groundOffset*.22,1040)-40,py=110+(i*83)%285;x.save();x.translate(px,py);x.rotate(i+groundOffset*.002);x.fillRect(-5,-2,10,5);x.restore()}}
  else if(sn===3){x.fillStyle='rgba(255,255,255,.82)';for(let i=0;i<34;i++){const px=loop(i*137-groundOffset*.12,1020)-30,py=loop(i*79+groundOffset*.08,420);x.beginPath();x.arc(px,py,2+(i%3),0,7);x.fill()}}
@@ -163,6 +209,7 @@ function drawCycloneRainbowSky(){
 function draw(){
  x.setTransform(canvasRenderScale,0,0,canvasRenderScale,0,0);
  x.save();
+ if(!animalSpriteCaptureMode){
  const cycloneVisual=cycloneState==='active';
  const lariatPower=lariatTimer>GAME_CONFIG.lariatWarningFrames?1:(lariatTimer>0?Math.max(.05,lariatTimer/GAME_CONFIG.lariatWarningFrames):0);
  if(lariatTimer>0&&!cycloneVisual){
@@ -264,12 +311,17 @@ function draw(){
    drawItemSprite(x,it.type);
    x.restore();
  }
+ }
 
+ if(animalSpriteCaptureMode){
+  x.setTransform(canvasRenderScale,0,0,canvasRenderScale,0,0);
+  x.clearRect(0,0,W,H);
+ }
  for(const o of obs){
   let oy=o.y??G-o.h;
   x.save();
   x.translate(o.x,oy);
-  if(o.flying){
+  if(o.flying&&!animalSpriteCaptureMode){
     x.translate(o.w/2,o.h/2);
     x.rotate(o.flyRot);
     x.translate(-o.w/2,-o.h/2);
@@ -277,7 +329,7 @@ function draw(){
   if(ANIMAL_TYPES.includes(o.type)){
     // Most animals face left. Dog faces whichever way it is currently running.
     const faceLeft = o.type==='dog' ? (o.dogDir<0) : true;
-    if(faceLeft){
+    if(faceLeft&&!animalSpriteCaptureMode){
       x.translate(o.w,0);
       x.scale(-1,1);
     }
@@ -285,23 +337,26 @@ function draw(){
 
   // Locomotion animation. Collision boxes stay unchanged.
   const stride=o.age*.23;
-  if(o.type==='pig' || o.type==='dog' || o.type==='cat'){
+  const cachedSprite=animalSpriteCaptureMode?null:animalSpriteFor(o);
+  if(!cachedSprite&&(o.type==='pig' || o.type==='dog' || o.type==='cat')){
     const bounce=Math.abs(Math.sin(stride))*3;
     const tilt=Math.sin(stride)*0.035;
     x.translate(0,-bounce);
     x.translate(o.w/2,o.h/2);x.rotate(tilt);x.translate(-o.w/2,-o.h/2);
-  }else if(o.type==='turtle'){
+  }else if(!cachedSprite&&o.type==='turtle'){
     x.translate(0,-Math.abs(Math.sin(stride*.55))*1.2);
-  }else if(o.type==='rabbit'){
+  }else if(!cachedSprite&&o.type==='rabbit'){
     x.translate(0,-Math.abs(Math.sin(stride*.8))*1.5);
-  }else if(o.type==='cow'){
+  }else if(!cachedSprite&&o.type==='cow'){
     const cowBounce=Math.abs(Math.sin(stride*.46))*2.5;
     const cowTilt=Math.sin(stride*.46)*0.018;
     x.translate(0,-cowBounce);
     x.translate(o.w/2,o.h/2);x.rotate(cowTilt);x.translate(-o.w/2,-o.h/2);
   }
 
-  if(drawTutorialAnimalSprite(x,o)){
+  if(cachedSprite){
+    drawCachedAnimalSprite(x,o,cachedSprite);
+  }else if(drawTutorialAnimalSprite(x,o)){
     // Pig and turtle are rendered by the shared sprite component.
   }else if(o.type==='pig'){
     // Chibi pig: pink round body, big snout, triangle ears and curly tail.
@@ -501,27 +556,9 @@ function draw(){
     x.fillRect(o.w*.52-cowStep,o.h*.80,10,o.h*.18);
 
   } else if(o.type==='birds'){
-    // Birds: bright blue, horizontal flock, rounded wings and yellow beaks.
-    const body='#e2b94f';
-    const outline='#765f25';
-    const positions=[
-      [20,14],[55,8],[90,14],[125,8]
-    ];
-    for(const [bx,by] of positions){
-      x.strokeStyle=outline;x.lineWidth=3;x.fillStyle=body;
-      x.beginPath();x.ellipse(bx,by+11,11,8,0,0,Math.PI*2);x.fill();x.stroke();
-
-      // single rounded wing
-      x.beginPath();x.ellipse(bx-8,by+9,8,5,-.5,0,Math.PI*2);x.fill();x.stroke();
-
-      // eye
-      x.fillStyle='#fff';x.beginPath();x.arc(bx+4,by+8,3.2,0,Math.PI*2);x.fill();
-      x.fillStyle='#111';x.beginPath();x.arc(bx+5,by+8,1.5,0,Math.PI*2);x.fill();
-
-      // yellow beak
-      x.fillStyle='#c8782e';
-      x.beginPath();x.moveTo(bx+10,by+11);x.lineTo(bx+18,by+14);x.lineTo(bx+10,by+16);x.closePath();x.fill();
-    }
+    // The stage-4 flock is static art. Draw one title-screen-generated bitmap
+    // instead of rebuilding four outlined birds every gameplay frame.
+    x.drawImage(warmBirdFlockLayer(),0,0,o.w,o.h);
 
   } else if(o.type==='crow'){
     // Crow flies above jump height; only its dropping becomes a hazard.
@@ -576,6 +613,7 @@ function draw(){
   }
   x.restore();
  }
+ if(animalSpriteCaptureMode){x.restore();return}
  for(const peel of bananaPeels){
    x.save();x.translate(peel.x,peel.y);
    x.strokeStyle='#8a6818';x.lineWidth=2;x.fillStyle=peel.landed?'#f2d15c':'#ffe47a';
